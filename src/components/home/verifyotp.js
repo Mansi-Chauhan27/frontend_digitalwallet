@@ -3,8 +3,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -58,12 +58,17 @@ export default function VerifyOtp() {
   const classes = useStyles();
 
   useEffect(()=>{
+    const formData = new FormData()
+    
+    formData.append('id',32);
+    
     const config = {
         headers: { Authorization: `Token ${localStorage.getItem('token')}` }
     };
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.get('http://127.0.0.1:8000/client/getcustomers/',config)
+    axios.post('http://127.0.0.1:8000/transaction/generatecard/',{'id':31},config)
+    // axios.get('http://127.0.0.1:8000/client/getcustomers/',config)
       .then((response) => {
         console.log(response,'iuiuuuiui');
         console.log(response.data);

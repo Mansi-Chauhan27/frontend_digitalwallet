@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
-import CSRFToken from './csrf';
+// import CSRFToken from './csrf';
 import { ToastContainer, toast } from "react-toastify";
 import { Redirect } from 'react-router-dom';
 
