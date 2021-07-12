@@ -3,8 +3,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -17,6 +17,7 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import agent  from '../../agent';
 
 function Copyright() {
   return (
@@ -60,16 +61,18 @@ export default function Login() {
   function onSubmit(e) {
     e.preventDefault()
 
-    const formData = new FormData(e.target)
+    const formData = new FormData(e.target);
     console.log('heyyyyy', formData, document.cookie)
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post('http://127.0.0.1:8000/client/login/', formData)
+    axios.post(agent.API_ROOT_LOCAL+'/client/login/', formData)
       .then((response) => {
         console.log(response);
         console.log(response.data);
 
         localStorage.setItem('token', response.data['token']);
+        localStorage.setItem('is_admin', response.data['is_admin']);
+        localStorage.setItem('user_type', response.data['user_type']);
 
         setIslogin(true)
 
@@ -131,10 +134,10 @@ export default function Login() {
             id="password"
             autoComplete="current-password"
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
-          />
+          /> */}
           <Button
             type="submit"
             fullWidth

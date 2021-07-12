@@ -6,10 +6,10 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import Customers from './customers';
-// import Device from './device';
+// import Customers from './customers';
+import Device from './device';
 import agent from '../../agent';
-import Owners from './owners';
+// import Owners from './owners';
 import { toast } from 'react-toastify';
 
 function TabPanel(props) {
@@ -52,12 +52,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Retailer() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
-  const [customerList, setCustomerList] = React.useState([]);
-  const [ownerList, setOwnerList] = React.useState([]);
-  // const [deviceList, setDeviceList] = React.useState([]);
+  // const [customerList, setCustomerList] = React.useState([]);
+  // const [ownerList, setOwnerList] = React.useState([]);
+  const [deviceList, setDeviceList] = React.useState([]);
   const [update, setUpdate] = React.useState(false);
 
   const handleChange = (event, newValue) => {
@@ -66,62 +66,59 @@ export default function Dashboard() {
 
   useEffect(() => {
 
-    const t = agent.DigitalWallet.get_cutomers()
-    t.then((res) => {
-      console.log(res.data, 'ygygiy', customerList);
-      if (res && res.data) {
-        setCustomerList(res.data);
-        console.log(res.data, 'ygygyyyyyyyyyiy', customerList);
-      }
-    }).catch(err => {
-      if (err.status === 405 || err.status === 403) {
-        toast.error('Permission Denied to Access Customers')
-      }
-    });
-
-    // agent.DigitalWallet.get_devices().then((res)=>{
-    //     console.log(res.data);
+    // agent.DigitalWallet.get_cutomers().then((res)=>{
+    //     console.log(res.data,'ygygiy',customerList);
     //     if(res && res.data)
     //     {
-    //         setDeviceList(res.data['data']);
-    //         console.log(deviceList)
+    //         setCustomerList(res.data);
+    //         console.log(res.data,'ygygyyyyyyyyyiy',customerList);
     //     }
-
     // });
 
-    const y = agent.DigitalWallet.get_owners()
-    y.then((res) => {
-      console.log(res.data, 'ygygiy', ownerList);
+    const t = agent.DigitalWallet.get_devices()
+    t.then((res) => {
+      console.log(res.data);
       if (res && res.data) {
-        setOwnerList(res.data);
-        console.log(res.data, 'ygygyyyyyyyyyiy', ownerList);
+        setDeviceList(res.data['data']);
+        console.log(deviceList)
       }
+
     }).catch(err => {
+      console.log(err.status);
       if (err.status === 405 || err.status === 403) {
-        toast.error('Permission Denied to access Reatilers')
+        toast.error('Permission Denied')
       }
     });
 
-  }, [update])
+    //   agent.DigitalWallet.get_owners().then((res)=>{
+    //     console.log(res.data,'ygygiy',ownerList);
+    //     if(res && res.data)
+    //     {
+    //         setOwnerList(res.data);
+    //         console.log(res.data,'ygygyyyyyyyyyiy',ownerList);
+    //     }
+    // });
+
+  }, [update,deviceList])
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Customers" {...a11yProps(0)} />
-          {/* <Tab label="Devices" {...a11yProps(1)} /> */}
-          <Tab label="Retailers" {...a11yProps(1)} />
+          {/* <Tab label="Customers" {...a11yProps(0)} /> */}
+          <Tab label="Devices" {...a11yProps(0)} />
+          {/* <Tab label="Owners" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
-        {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
-      </TabPanel>
-      {/* <TabPanel value={value} index={1}>
-       {deviceList && <Device deviceList ={deviceList} />}
+      {/* <TabPanel value={value} index={0}>
+       {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
       </TabPanel> */}
-      <TabPanel value={value} index={1}>
-        {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
+      <TabPanel value={value} index={0}>
+        {deviceList && <Device deviceList={deviceList} setUpdate={setUpdate}/>}
       </TabPanel>
+      {/* <TabPanel value={value} index={2}>
+      {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
+      </TabPanel>*/}
     </div>
   );
 }
