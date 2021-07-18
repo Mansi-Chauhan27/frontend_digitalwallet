@@ -16,7 +16,6 @@ import Button from '@material-ui/core/Button';
 import { Row, Col } from 'react-bootstrap';
 import agent from '../../agent';
 import { toast } from "react-toastify";
-// import { isIterableArray } from '../common/utils';
 import TextField from '@material-ui/core/TextField';
 
 
@@ -73,34 +72,14 @@ export default function AddDevice(props) {
 
 
     const classes = useStyles();
-    // const [expanded, setExpanded] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [deviceName, setDeviceName] = React.useState('');
-    // const [openModal, setOpenModal] = React.useState(false);
-    // const [giftCardList, setGiftCardList] = React.useState([]);
-
-    // useEffect(() => {
-    //     agent.DigitalWallet.get_giftcard().then((res) => {
-    //         console.log(res.data['data']);
-    //         if (res && res.data) {
-    //             setGiftCardList(res.data['data'])
-    //         }
-    //     });
-    // }, [])
-
-    // console.log(openModal)
+    
 
     const handleChangeModal = (event) => {
         setDeviceName(event.target.value);
     };
 
-    // const handleCloseModal = () => {
-    //     setOpenModal(false);
-    // };
-
-    // const handleOpenModal = () => {
-    //     setOpenModal(true);
-    // };
 
     const handleOpen = () => {
         setOpen(true);
@@ -110,6 +89,7 @@ export default function AddDevice(props) {
         setOpen(false);
     };
 
+    // Add Device
     const onClickButton = () => {
         console.log('clickedd', deviceName);
         if (deviceName) {

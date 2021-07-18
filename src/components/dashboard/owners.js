@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-// import ReactDOM from "react-dom";
 import BootstrapTable from "react-bootstrap-table-next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
@@ -11,9 +10,7 @@ import {
     DropdownToggle,
 } from 'reactstrap'
 
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BsThreeDots } from 'react-icons/bs';
-// import axios from 'axios';
 import agent from "../../agent";
 import StatusFormatter  from "../common/statusFormatter";
 
@@ -21,17 +18,14 @@ import StatusFormatter  from "../common/statusFormatter";
 
 const Owners = props => {
 
-    const [customerList, setCustomerList] = React.useState([])
+    const [customerList, setCustomerList] = React.useState([]);
+
+    // Set owners list
     useEffect(() => {
-        console.log('props.customerList', props.customerList)
         setCustomerList(props.customerList)
     }, [])
 
-    // useEffect(() => {
-    //     agent.DigitalWallet.update_cutomers({ id: 32 }).then((res) => {
-    //         console.log(res)
-    //     })
-    // }, [])
+
 
     const useStyles = makeStyles((theme) => ({
         paper: {
@@ -56,6 +50,7 @@ const Owners = props => {
         }
       }));
 
+    // Deactivate Owner
     function deavtivateUser(user_id) {
         console.log('deactivatee', user_id);
         if (user_id) {
@@ -66,16 +61,9 @@ const Owners = props => {
         }
     }
 
-    // function generateCard(user_id) {
-    //     console.log('generateCard', user_id);
-    //     if (user_id) {
-    //         agent.DigitalWallet.generate_card({ 'id': user_id }).then((res) => {
-    //             console.log(res.data)
-    //             props.setUpdate(true)
-    //         })
-    //     }
-    // }
+    
 
+    // Columns
     const columns = [
         {
             dataField: "first_name",

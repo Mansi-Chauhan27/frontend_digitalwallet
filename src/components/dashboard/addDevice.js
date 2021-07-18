@@ -110,9 +110,12 @@ export default function AddDevice(props) {
         if (deviceName) {
             console.log(deviceName);
             
-            agent.DigitalWallet.create_device({'device_name':deviceName}).then((res) => {
+            const t = agent.DigitalWallet.create_device({'device_name':deviceName})
+            t.then((res) => {
                 console.log(res);
                 handleClose();
+            }).catch(err=>{
+                toast.error('Permission Denied')
             })
             console.log(props)
 
@@ -120,7 +123,7 @@ export default function AddDevice(props) {
 
         }
         else {
-            toast.error('Please Select Gift Card')
+            toast.error('Please Select Card')
         }
     }
 

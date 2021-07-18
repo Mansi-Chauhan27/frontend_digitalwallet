@@ -99,31 +99,23 @@ export default function TransferToConsumer(props) {
         setUserCardsList(props.userCardsList);
     },[props])
     
+    // GET CARDS
     // useEffect(() => {
-    //     agent.DigitalWallet.get_giftcard().then((res) => {
+    //     agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 }).then((res) => {
     //         console.log(res.data['data']);
     //         if (res && res.data) {
-    //             setGiftCardList(res.data['data'])
+    //             console.log(res.data)
+    //             setUserCardsList(res.data['data'])
+    //         }
+    //     });
+    //     agent.DigitalWallet.get_cards({ 'action': 'get_other_users_cards', 'userid': 65 }).then((res) => {
+    //         console.log(res.data);
+    //         if (res && res.data) {
+    //             console.log(res.data['customers'])
+    //             setCustomerCardsList(res.data['customers'])
     //         }
     //     });
     // }, [])
-
-    useEffect(() => {
-        agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 }).then((res) => {
-            console.log(res.data['data']);
-            if (res && res.data) {
-                console.log(res.data)
-                setUserCardsList(res.data['data'])
-            }
-        });
-        agent.DigitalWallet.get_cards({ 'action': 'get_other_users_cards', 'userid': 65 }).then((res) => {
-            console.log(res.data);
-            if (res && res.data) {
-                console.log(res.data['customers'])
-                setCustomerCardsList(res.data['customers'])
-            }
-        });
-    }, [])
 
     const handleChangeModal = (event) => {
         setCustomerCard(event.target.value);
@@ -160,9 +152,9 @@ export default function TransferToConsumer(props) {
     const handleChangeAmount = (event) => {
         setAmount(event.target.value);
     };
+
+    // Transfer Money
     const onClickButton = () => {
-        console.log('clickedd', userCard);
-        console.log('clickedd', customerCard,amount);
         if(userCard && customerCard){
                 var transferData = {
                     action:'from_customer',

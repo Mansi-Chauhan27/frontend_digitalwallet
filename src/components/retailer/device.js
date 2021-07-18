@@ -95,37 +95,40 @@ const Device = props => {
     const [amount, setAmount] = React.useState(0);
 
 
-
+    // To Get All The Devices of the logged in Retailer from props
     useEffect(() => {
         console.log('props.deviceList', props.deviceList, props)
         setDeviceList(props.deviceList)
     }, [props])
 
-
+    // To get cards of customers for refund transaction
     useEffect(() => {
-      const t =  agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_for_refund', 'userid': 65 })
-      t.then((res) => {
-            console.log(res.data);
-            if (res && res.data) {
-                console.log(res.data['customers'])
-                setCustomerCardsList(res.data['customers'])
-            }
-        }).catch(err=>{
-            if(err.status===403)
-           {toast.error('Permission Deniesd')}
-           else{
-               toast.error('Something Went Wrong')
-           }
-        });
+        if (open) {
+
+            const t = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_for_refund', 'userid': 65 })
+            t.then((res) => {
+                console.log(res.data);
+                if (res && res.data) {
+                    console.log(res.data['customers'])
+                    setCustomerCardsList(res.data['customers'])
+                }
+            }).catch(err => {
+                if (err.status === 403) { toast.error('Permission Deniesd') }
+                else {
+                    toast.error('Something Went Wrong')
+                }
+            });
+        }
+
     }, [open])
 
+    // To Deactivate Device
     function deactivateDevice(device_id) {
         console.log('deactivatee', device_id);
         if (device_id) {
             const t = agent.DigitalWallet.deactivate_device({ 'id': device_id })
             t.then((res) => {
                 console.log(res.data)
-                // props.setUpdate(true)
                 if (res || res.data) {
                     props.setUpdate(true);
                     toast.success('Deactivated Successfully')
@@ -137,13 +140,13 @@ const Device = props => {
         }
     }
 
+    // To generate Key for the device
     function generateKey(device_id) {
         console.log('deactivatee', device_id);
         if (device_id) {
             const t = agent.DigitalWallet.create_device_key({ 'device_id': device_id })
             t.then((res) => {
                 console.log(res.data)
-                // props.setUpdate(true)
                 if (res || res.data) {
                     props.setUpdate(true)
                     console.log(res.data['data'])
@@ -173,6 +176,7 @@ const Device = props => {
     const handleChangeModal = (event) => {
         setCustomerCard(event.target.value);
     };
+
     const handleCloseModal = () => {
         setOpenModal(false);
     };
@@ -182,12 +186,13 @@ const Device = props => {
         setAmount(event.target.value);
     };
 
-    function onClickButton(){
+    // Refund Transaction
+    function onClickButton() {
 
         if (customerCard && fromDeviceCardId && deviceIdToTransfer) {
             var transferData = {
-                action:'from_device',
-                device_id:deviceIdToTransfer,
+                action: 'from_device',
+                device_id: deviceIdToTransfer,
                 from_card_id: fromDeviceCardId,
                 to_card_id: customerCard['id'],
                 // to_card_id : 4,
@@ -207,7 +212,7 @@ const Device = props => {
                     toast.success(res.data['msg']);
                 }
                 //    props.setUpdateHistory(true)
-            }).catch(err=>{
+            }).catch(err => {
                 toast.error('Something Went Wrong')
             })
             // console.log(props)
@@ -220,6 +225,7 @@ const Device = props => {
 
     }
 
+    // Columns
     const columns = [
 
         {
@@ -259,6 +265,7 @@ const Device = props => {
             csvExport: false,
         }
     ];
+
     return (
         <div style={{ padding: "20px" }}>
             <div>

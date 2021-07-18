@@ -10,7 +10,6 @@ export default function Index() {
 
     
     useEffect(()=>{
-        console.log(localStorage.getItem('user_type'),'fadgfa')
         var user_type = localStorage.getItem('user_type')
         setComp(user_type)
         // setComp(localStorage.getItem('user_type')==='admin'?Dashboard:localStorage.getItem('user_type')==='owner'?Retailer :Customer
@@ -19,7 +18,6 @@ export default function Index() {
 
     return(<React.Fragment>
         <div style={{height:'100%'}}>
-        {console.log('TESTTTTTTTTTT',comp)}
         {/* {comp==='admin'?<Dashboard/>:comp==='owner'?<Retailer/> :<Customer/>} */}
         {comp==='admin'? <Dashboard/> : <></>}
         {comp==='customer'? <Customer/> : <></>}

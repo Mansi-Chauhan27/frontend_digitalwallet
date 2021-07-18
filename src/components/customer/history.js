@@ -58,7 +58,6 @@ export default function History(props) {
   }, [props.userCardsList])
 
   useEffect(() => {
-    console.log('huoiuhoho', userCard)
     if (userCard !== '') {
       const t = agent.DigitalWallet.get_balance({ 'action': 'get_history', 'user_id': 65, 'card_id': userCard['id'] })
       t.then((res) => {
@@ -134,37 +133,12 @@ export default function History(props) {
     <React.Fragment>
     <Card className={classes.root}>
       <CardHeader
-        // avatar={
-        //   <Avatar aria-label="recipe" className={classes.avatar}>
-        //     R
-        //   </Avatar>
-        // }
-        // action={
-        //   <IconButton aria-label="settings">
-        //     <MoreVertIcon />
-        //   </IconButton>
-        // }
+        
         title="History"
-      // subheader="September 14, 2016"
       />
-      {/* <CardMedia
-        className={classes.media}
-        image="/static/images/cards/paella.jpg"
-        title="Paella dish"
-      /> */}
-      {/* <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">
-          This impressive paella is a perfect party dish and a fun meal to cook together with your
-          guests. Add 1 cup of frozen peas along with the mussels, if you like.
-        </Typography>
-      </CardContent> */}
+
       <CardActions disableSpacing>
-        {/* <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton> */}
+        
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,
@@ -179,7 +153,6 @@ export default function History(props) {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <div style={{ padding: "20px" }}>
-            {/* <h1 className="h2">Products</h1> */}
             <div>
               <FormControl className={classes.formControl} style={{ width: '50%' }}>
                 <InputLabel id="demo-controlled-open-select-label1">Select Your Card</InputLabel>

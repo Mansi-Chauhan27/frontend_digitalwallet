@@ -106,19 +106,17 @@ const Customers = props => {
     const [amount, setAmount] = React.useState(0);
     const [selctedUserId, setSelectedUseriD] = React.useState(null);
 
-
+    // Set Customer's List
     useEffect(() => {
-        console.log('props.customerList', props.customerList)
         setCustomerList(props.customerList)
     }, [props.customerList])
 
-    // useEffect(() => {
-    //     agent.DigitalWallet.update_cutomers({ id: 32 }).then((res) => {
-    //         console.log(res)
-    //     })
-    // }, [])
+   
 
     useEffect(() => {
+        if(open){
+
+        }
         const r = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 });
         r.then((res) => {
             console.log(res.data['data']);
@@ -129,9 +127,7 @@ const Customers = props => {
             }
         }).catch(er => {
             console.log('WHATTA');
-            // setValid(true)
         });
-        console.log(selctedUserId)
         const x = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_by_id', 'userid': selctedUserId })
         x.then((res) => {
             console.log(res.data);
@@ -140,8 +136,12 @@ const Customers = props => {
                 setCustomerCardsList(res.data['data'])
             }
         }).catch(er => {
-            console.log('WHATTA');
-            // setValid(true)
+            if(er.status===403 || er.status == 405){
+                toast.error('Permission Denied');
+            }
+            else{
+                toast.error('Something Went Wrong');
+            }
         });
     }, [open])
 
@@ -185,10 +185,8 @@ const Customers = props => {
     };
 
     
-
+    // Transfer Money
     const onClickButton = () => {
-        console.log('clickedd');
-        console.log('clickedd', customerCard, amount);
         if (userCard && customerCard) {
             var transferData = {
                 action:'from_customer',
@@ -198,31 +196,29 @@ const Customers = props => {
                 amount_to_be_transferred: amount
             }
             console.log(transferData)
-            agent.DigitalWallet.transfer_money(transferData).then((res) => {
+            const t = agent.DigitalWallet.transfer_money(transferData)
+            t.then((res) => {
                 if (res && res.data && res.data['msg'] === 'Success') {
                     console.log(res);
-                    // props.setUpdateBalance(true);
                     toast.success('Money added Succesfully');
                     handleClose();
 
                 }
                 else {
-                    toast.success('Error Transferring Money');
+                    toast.error(res.data['msg']);
                 }
-                //    props.setUpdateHistory(true)
+            }).catch(err=>{
+                toast.error('Permission Denied');
             })
-            // console.log(props)
-
 
         }
         else {
-            toast.error('Please Select Gift Card')
+            toast.error('Please Select Card')
         }
     }
 
-
+    // Deactivate User
     function deavtivateUser(user_id) {
-        console.log('deactivatee', user_id);
         if (user_id) {
             agent.DigitalWallet.update_cutomers({ 'id': user_id }).then((res) => {
                 console.log(res.data)
@@ -231,24 +227,14 @@ const Customers = props => {
         }
     }
 
-    // function generateCard(user_id) {
-    //     console.log('generateCard', user_id);
-    //     if (user_id) {
-    //         agent.DigitalWallet.generate_card({ 'id': user_id }).then((res) => {
-    //             console.log(res.data)
-    //             props.setUpdate(true)
-    //         })
-    //     }
-    // }
-
     const { SearchBar } = Search;
 
     const selectOptions = {
         0: 'Active',
         1: 'In Active',
-        // 2: 'unknown'
       };
 
+    // Columns
     const columns = [
         {
             dataField: "first_name",
@@ -320,17 +306,7 @@ const Customers = props => {
                        data={customerList}
                        columns={columns}
                        search={ { searchFormatted: true } }
-                    //    striped
-                    //    hover
-                    //    bootstrap4
-                    //    condensed
-                    //    wrapperClasses="table-responsive"
-                    //    classes={classes.tab}
-
-                    //    headerClasses="bg-200 text-900 border-y border-200"
-                    //    pagination={paginationFactory()}
-                    
-                       
+                     
                     >
                         {
                             props => (
@@ -342,9 +318,6 @@ const Customers = props => {
                                     <hr />
                                     <BootstrapTable
                                         { ...props.baseProps }
-                                        // keyField="id"
-                                        // data={customerList}
-                                        // columns={columns}
                                         striped
                                         hover
                                         bootstrap4
