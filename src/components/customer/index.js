@@ -115,6 +115,7 @@ const Customer = () => {
     }
     return (
         <React.Fragment>
+            <div style={{ background:'linear-gradient(45deg, black, transparent)', height:'100%'}}> 
             <div style={{ paddingLeft: '8%'}}>
             {balance.length>0 && <Balance balance={balance} />}
             </div>
@@ -134,7 +135,8 @@ const Customer = () => {
             <div style={{ paddingLeft:'8%' }}>
                 { res && <History userCardsList={userCardsList} />}
             </div>
-
+            {/* <div style={{height:'30px'}}></div> */}
+            </div>
         </React.Fragment>
     )
 }

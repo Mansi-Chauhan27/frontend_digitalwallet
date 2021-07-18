@@ -75,7 +75,7 @@ const Device = props => {
             formatter: (dataField, row, { id }) => (
                 // Control your row with this id
                 <UncontrolledDropdown>
-                    <DropdownToggle color="link" size="sm" className="text-600 btn-reveal" >
+                    <DropdownToggle color="link" size="sm" className="text-600 btn-reveal" disabled={row['active'] === 'false' } >
                         {/* <FontAwesomeIcon icon="ellipsis-h" className="fs--1" /> */}
                         <BsThreeDots />
                     </DropdownToggle>

@@ -16,6 +16,7 @@ import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import agent from '../../agent';
 import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 import { isIterableArray } from '../common/utils';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,11 +60,19 @@ export default function History(props) {
   useEffect(() => {
     console.log('huoiuhoho', userCard)
     if (userCard !== '') {
-      agent.DigitalWallet.get_balance({ 'action': 'get_history', 'user_id': 65, 'card_id': userCard['id'] }).then((res) => {
+      const t = agent.DigitalWallet.get_balance({ 'action': 'get_history', 'user_id': 65, 'card_id': userCard['id'] })
+      t.then((res) => {
         console.log(res.data)
         if (res && res.data) {
           console.log(res.data['data'])
           setHistoryList(res.data['data'])
+        }
+      }).catch(err=>{
+        if(err.status===404){
+          toast.info('No Transaction Made')
+        }
+        else{
+          toast.error('Something Went Wrong!');
         }
       });
     }

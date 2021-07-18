@@ -30,6 +30,9 @@ import TextField from '@material-ui/core/TextField';
 import { red } from '@material-ui/core/colors';
 import StatusFormatter from "../common/statusFormatter";
 import './style.css';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 
 
 
@@ -40,13 +43,13 @@ const useStyles = makeStyles((theme) => ({
     form: {
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(1),
-      },
-      submit: {
+    },
+    submit: {
         margin: theme.spacing(3, 0, 2),
-      },
-      tab:{
-          tableLayout:'auto !important'
-      },
+    },
+    tab: {
+        tableLayout: 'auto !important'
+    },
     media: {
         height: 0,
         paddingTop: '56.25%', // 16:9
@@ -101,6 +104,8 @@ const Customers = props => {
     const [openModal, setOpenModal] = React.useState(false);
     const [openModalUser, setOpenModalUser] = React.useState(false);
     const [amount, setAmount] = React.useState(0);
+    const [selctedUserId, setSelectedUseriD] = React.useState(null);
+
 
     useEffect(() => {
         console.log('props.customerList', props.customerList)
@@ -122,18 +127,19 @@ const Customers = props => {
                 setUserCardsList(res.data['data'])
                 // setRes(true);
             }
-        }).catch(er=>{
+        }).catch(er => {
             console.log('WHATTA');
             // setValid(true)
         });
-        const x = agent.DigitalWallet.get_cards({ 'action': 'get_other_users_cards', 'userid': 65 })
+        console.log(selctedUserId)
+        const x = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_by_id', 'userid': selctedUserId })
         x.then((res) => {
             console.log(res.data);
             if (res && res.data) {
-                console.log(res.data['customers'])
-                setCustomerCardsList(res.data['customers'])
+                console.log(res.data['data'])
+                setCustomerCardsList(res.data['data'])
             }
-        }).catch(er=>{
+        }).catch(er => {
             console.log('WHATTA');
             // setValid(true)
         });
@@ -144,8 +150,11 @@ const Customers = props => {
         setOpenModal(true);
     };
 
-    const handleOpen = () => {
+    const handleOpen = (userid) => {
+        setSelectedUseriD(userid);
         setOpen(true);
+        console.log(userid,'userid');
+        
     };
 
     const handleClose = () => {
@@ -158,6 +167,9 @@ const Customers = props => {
 
     const handleChangeModal = (event) => {
         setCustomerCard(event.target.value);
+    };
+    const handleCloseModal = () => {
+        setOpenModal(false);
     };
 
     const handleChangeModalUser = (event) => {
@@ -172,40 +184,38 @@ const Customers = props => {
         setOpenModalUser(true);
     };
 
-    const handleCloseModal = () => {
-        setOpenModal(false);
-    };
+    
 
     const onClickButton = () => {
         console.log('clickedd');
-        console.log('clickedd', customerCard,amount);
-        if(userCard && customerCard){
-                var transferData = {
-                    from_card_id :userCard['id'],
-                    to_card_id :customerCard['id'],
-                    // to_card_id : 4,
-                    amount_to_be_transferred : amount
-               }
-               console.log(transferData)
-               agent.DigitalWallet.transfer_money(transferData).then((res)=>{
-                   if(res && res.data && res.data['msg']==='Success')
-                   {
+        console.log('clickedd', customerCard, amount);
+        if (userCard && customerCard) {
+            var transferData = {
+                action:'from_customer',
+                from_card_id: userCard['id'],
+                to_card_id: customerCard['id'],
+                // to_card_id : 4,
+                amount_to_be_transferred: amount
+            }
+            console.log(transferData)
+            agent.DigitalWallet.transfer_money(transferData).then((res) => {
+                if (res && res.data && res.data['msg'] === 'Success') {
                     console.log(res);
                     // props.setUpdateBalance(true);
                     toast.success('Money added Succesfully');
                     handleClose();
 
                 }
-                else{
+                else {
                     toast.success('Error Transferring Money');
                 }
                 //    props.setUpdateHistory(true)
-               })
+            })
             // console.log(props)
 
-              
+
         }
-        else{
+        else {
             toast.error('Please Select Gift Card')
         }
     }
@@ -231,28 +241,44 @@ const Customers = props => {
     //     }
     // }
 
+    const { SearchBar } = Search;
+
+    const selectOptions = {
+        0: 'Active',
+        1: 'In Active',
+        // 2: 'unknown'
+      };
+
     const columns = [
         {
             dataField: "first_name",
             text: "First Name",
-            classes:'tr-row'
+            classes: 'tr-row'
         },
         {
             dataField: "last_name",
             text: "Last name",
-            classes:'tr-row'
+            classes: 'tr-row',
+            // style: {
+            //     fontWeight: 'bold',
+            //     fontSize: '18px'
+            //   }
         },
         {
             dataField: "email",
             text: "Email",
             classes: 'py-2 text-10 text-center align-middle tr-row',
+            // classes:'tr-row',
             headerClasses: 'text-10 text-primary text-center',
         },
         {
             dataField: "is_active",
             text: "Status",
-            formatter: (row, { is_active }) => (<StatusFormatter status={is_active} component={'device'} />),
-
+            classes: 'py-2 text-10 text-center align-middle tr-row',
+            formatter: (cell, { is_active }) => (<StatusFormatter status={is_active} component={'device'} />),
+            // filter: selectFilter({
+            //     options: selectOptions
+            //   })
         },
         {
             dataField: '',
@@ -268,9 +294,9 @@ const Customers = props => {
                         <BsThreeDots />
                     </DropdownToggle>
                     <DropdownMenu right className="border p-0">
-                        <DropdownItem className="text-10" onClick={() => { console.log('hiu');handleOpen() }}>AddMoney</DropdownItem>
-                       {/* {row['carddetails__id'] !== null ? <></> : <DropdownItem className="text-10" onClick={() => { console.log('hiu'); generateCard(row['id'])  }} >Generate Card</DropdownItem>} */}
-                        {!row['is_active']  ? <></> :<DropdownItem className="text-10" onClick={() => { console.log('hiu', row['id']); deavtivateUser(row['id']) }} >Deactivate</DropdownItem>}
+                        <DropdownItem className="text-10" onClick={() => { console.log('hiu'); handleOpen(row['id']) }}>AddMoney</DropdownItem>
+                        {/* {row['carddetails__id'] !== null ? <></> : <DropdownItem className="text-10" onClick={() => { console.log('hiu'); generateCard(row['id'])  }} >Generate Card</DropdownItem>} */}
+                        {!row['is_active'] ? <></> : <DropdownItem className="text-10" onClick={() => { console.log('hiu', row['id']); deavtivateUser(row['id']) }} >Deactivate</DropdownItem>}
                         {/* {row['total_targets'] === 0 ? <></> : <DropdownItem className="text-10" onClick={() => { setGroupDetails([{ id: row['id'], name: row['group_name'] }]); setRemoveAllUsersModal(true) }} >Remove All Users</DropdownItem>}
                     <DropdownItem className="text-10" onClick={() => { setGroupDetails([{ id: row['id'], name: row['group_name'] }]); setArchiveAllUsersModal(true) }} >Archive All Users</DropdownItem>
                     {row['type'] === 'Virtual' ? <DropdownItem className="text-10" onClick={() => { }} >Delete Group</DropdownItem> : <></>} */}
@@ -281,29 +307,63 @@ const Customers = props => {
         }
     ];
 
+    
+
     const classes = useStyles();
     return (
         <React.Fragment>
-        <div style={{ padding: "20px;" }} className='col-sm-12'>
-            <h1 className="h2">Customers</h1>
-            <div>
-            <BootstrapTable
-            keyField="id" 
-            data={customerList} 
-            columns={columns}
-            striped
-            hover
-            bootstrap4
-            condensed
-            // .wrapperClasses="table-responsive"
-            classes={classes.tab}
+            <div style={{ padding: "20px;" }} className='col-sm-12'>
+                <h1 className="h2">Customers</h1>
+                <div>
+                    <ToolkitProvider
+                       keyField="id"
+                       data={customerList}
+                       columns={columns}
+                       search={ { searchFormatted: true } }
+                    //    striped
+                    //    hover
+                    //    bootstrap4
+                    //    condensed
+                    //    wrapperClasses="table-responsive"
+                    //    classes={classes.tab}
 
-            headerClasses="bg-200 text-900 border-y border-200"
-            />
+                    //    headerClasses="bg-200 text-900 border-y border-200"
+                    //    pagination={paginationFactory()}
+                    
+                       
+                    >
+                        {
+                            props => (
+                                <div>
+                                   
+                                    <div style={{float:'right'}}>
+                                    <SearchBar { ...props.searchProps } />
+                                    </div>
+                                    <hr />
+                                    <BootstrapTable
+                                        { ...props.baseProps }
+                                        // keyField="id"
+                                        // data={customerList}
+                                        // columns={columns}
+                                        striped
+                                        hover
+                                        bootstrap4
+                                        condensed
+                                        wrapperClasses="table-responsive"
+                                        classes={classes.tab}
+                                        headerClasses="bg-200 text-900 border-y border-200"
+                                        pagination={paginationFactory()}
+                                        // filter={ filterFactory()}
+                                        
+                                    />
+                                </div>
+                            )
+                        }
+                    </ToolkitProvider>
+                </div>
             </div>
-        </div>
 
-        <Modal 
+            <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 className={classes.modal}
@@ -316,7 +376,7 @@ const Customers = props => {
                 }}
             >
                 <Fade in={open}>
-                    <div className={classes.paper} style={{display:'inline-table'}}>
+                    <div className={classes.paper} style={{ display: 'inline-table' }}>
                         <h2 id="transition-modal-title">Transfer Money to Customer</h2>
                         <br />
                         <Row>
@@ -345,7 +405,7 @@ const Customers = props => {
                                                     </option>
                                                 )
                                             }
-                                            )} 
+                                            )}
                                     </Select>
 
 
@@ -387,21 +447,21 @@ const Customers = props => {
 
                         </Row>
                         <br />
-                        <Row style={{alignItems:'center'}}>
-                        <Col>
-                           <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="amount"
-                                label="Amount"
-                                id="amount"
-                                autoComplete="amount"
-                                value={amount}
-                                onChange={handleChangeAmount}
-                            />
-                           </Col>
+                        <Row style={{ alignItems: 'center' }}>
+                            <Col>
+                                <TextField
+                                    variant="outlined"
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    name="amount"
+                                    label="Amount"
+                                    id="amount"
+                                    autoComplete="amount"
+                                    value={amount}
+                                    onChange={handleChangeAmount}
+                                />
+                            </Col>
                             <Col>
 
                                 <Button
@@ -416,7 +476,7 @@ const Customers = props => {
                                 </Button>
 
                             </Col>
-                          
+
                         </Row>
 
                     </div>

@@ -62,10 +62,10 @@ const useStyles = makeStyles((theme) => ({
         // border: '2px solid #000',
         boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
-        top: '50%',
-        bottom: '50%',
-        width: '50%',
-        height: '50%',
+        // top: '50%',
+        // bottom: '50%',
+        // width: '50%',
+        // height: '50%',
     },
 }));
 
@@ -115,9 +115,22 @@ export default function AddDevice(props) {
         if (deviceName) {
             console.log(deviceName);
             
-            agent.DigitalWallet.create_device({'device_name':deviceName}).then((res) => {
+            const t = agent.DigitalWallet.create_device({'device_name':deviceName})
+            t.then((res) => {
                 console.log(res);
+                if(res || res.data){
+                    // props.setUpdate(true)
+                    console.log(props)
+                    toast.success('Device added Succesfully');
+                }
                 handleClose();
+            }).catch(err=>{
+                if(err.status == 405){
+                    toast.error('User Not verified To add A device, Please Verify')
+                }
+                else{
+                    toast.error('Something Went Wrong')
+                }
             })
             console.log(props)
 
@@ -125,7 +138,7 @@ export default function AddDevice(props) {
 
         }
         else {
-            toast.error('Please Select Gift Card')
+            toast.error('Device Name is Empty')
         }
     }
 
@@ -162,10 +175,12 @@ export default function AddDevice(props) {
             >
                 <Fade in={open}>
                     <div className={classes.paper}>
-                        <h2 id="transition-modal-title">Add Device</h2>
-                        <br />
-                        <Row style={{alignItems:'center'}}>
-                            <Col>
+
+                            <h2 id="transition-modal-title">Add Device</h2>
+
+                       
+                        <div style={{alignItems:'center'}}>
+                            <div>
                                 {/* <FormControl className={classes.formControl} style={{ width: '50%' }}>
                                     <InputLabel id="demo-controlled-open-select-label">Device Name</InputLabel> */}
                                     <TextField
@@ -183,8 +198,8 @@ export default function AddDevice(props) {
                                     />
                                 {/* </FormControl> */}
 
-                            </Col>
-                            <Col>
+                            </div>
+                            <div>
 
                                 <Button
                                     // type="submit"
@@ -197,8 +212,8 @@ export default function AddDevice(props) {
                                     Add
                                 </Button>
 
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
 
                     </div>
                 </Fade>

@@ -105,13 +105,13 @@ const Owners = props => {
             formatter: (dataField, row, { id, email }) => (
                 // Control your row with this id
                 <UncontrolledDropdown>
-                    <DropdownToggle color="link" size="sm" className="text-600 btn-reveal" >
+                    <DropdownToggle color="link" size="sm" className="text-600 btn-reveal" disabled={row['is_active'] === 'false'?true : false } >
                         {/* <FontAwesomeIcon icon="ellipsis-h" className="fs--1" /> */}
                         <BsThreeDots />
                     </DropdownToggle>
                     <DropdownMenu right className="border p-0">
                         {/* <DropdownItem className="text-10" onClick={() => { console.log('hiu') }}>View</DropdownItem> */}
-                        <DropdownItem className="text-10" onClick={() => { console.log('hiu') }} >Add Device</DropdownItem>
+                        {/* <DropdownItem className="text-10" onClick={() => { console.log('hiu') }} >Add Device</DropdownItem> */}
                         {!row['is_active']  ? <></> :<DropdownItem className="text-10" onClick={() => { console.log('hiu', row['id']); deavtivateUser(row['id']) }} >Deactivate</DropdownItem>}
                         {/* {row['total_targets'] === 0 ? <></> : <DropdownItem className="text-10" onClick={() => { setGroupDetails([{ id: row['id'], name: row['group_name'] }]); setRemoveAllUsersModal(true) }} >Remove All Users</DropdownItem>}
                     <DropdownItem className="text-10" onClick={() => { setGroupDetails([{ id: row['id'], name: row['group_name'] }]); setArchiveAllUsersModal(true) }} >Archive All Users</DropdownItem>

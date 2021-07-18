@@ -7,7 +7,9 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.Fragment>
+    {/* <div> */}
     <App />
+    {/* </div> */}
     {/* <Home /> */}
   </React.Fragment>,
   document.getElementById('root')

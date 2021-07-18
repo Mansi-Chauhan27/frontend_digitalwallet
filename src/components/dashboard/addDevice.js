@@ -157,7 +157,12 @@ export default function AddDevice(props) {
             >
                 <Fade in={open}>
                     <div className={classes.paper}>
-                        <h2 id="transition-modal-title">Add Device</h2>
+                        <Row>
+                            <Col>
+                            <h2 id="transition-modal-title">Add Device</h2>
+                            </Col>
+                        </Row>
+                        
                         <br />
                         <Row style={{alignItems:'center'}}>
                             <Col>

@@ -35,10 +35,10 @@ const StatusFormatter = ({ status, component }) => {
                     </div>
                 </Flex>
             </CardHeader> : component === 'device'
-                ? <Badge color={`soft-${color}`} className="rounded-capsule">
+                ? <Badge color={color} className="rounded-capsule" >
                     {icon ? <FontAwesomeIcon icon={icon} transform="shrink-2" className="ml-1" /> : <></>}&nbsp;&nbsp;
-            {text}
-                </Badge> : <Badge color={`soft-${color}`} className="fs--2" >{text}</Badge>
+                    {text}
+                </Badge> : <Badge color={color} className="rounded-capsule" >{text}</Badge>
             }
         </div>
     );

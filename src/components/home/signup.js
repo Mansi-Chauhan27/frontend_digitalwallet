@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-// import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  makeStyles,
+  Container
+} from '@material-ui/core';
+
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 import axios from 'axios';
-// import CSRFToken from './csrf';
 import { ToastContainer, toast } from "react-toastify";
 import { Redirect } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
+import agent from '../../agent';
 
 function Copyright() {
   return (
@@ -35,6 +37,7 @@ function Copyright() {
   );
 }
 
+// Styles
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(4),
@@ -56,27 +59,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Login() {
+export default function Signup() {
 
   const [islogin, setIslogin] = useState(false)
   const [usertype, setUsertype] = React.useState('customer');
 
   const classes = useStyles();
 
+  // Submit Method
   function onSubmit(e) {
     e.preventDefault()
 
     // console.log()
     const formData = new FormData()
-    console.log('heyyyyy', formData, e.target.password.value)
     formData.append('email', e.target.email.value);
     formData.append('first_name', e.target.firstname.value);
     formData.append('last_name', e.target.lastname.value);
     formData.append('password', e.target.password.value);
     formData.append('password2', e.target.password2.value)
-    formData.append('is_admin', e.target.usertype.value === 'admin' ? true : false)
-    formData.append('is_customer', e.target.usertype.value === 'customer' ? true : false)
-    formData.append('is_retailer', e.target.usertype.value === 'retailer' ? true : false)
+    formData.append('is_admin', e.target.usertype.value === 'admin' ? 'True' : 'False')
+    formData.append('is_customer', e.target.usertype.value === 'customer' ? 'True' : 'False')
+    formData.append('is_owner', e.target.usertype.value === 'retailer' ? 'True' : 'False')
     // formData.append('is_admin', true)
     // formData.append('is_customer', false)
     // formData.append('is_owner', false)
@@ -94,7 +97,7 @@ export default function Login() {
 
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post('http://127.0.0.1:8000/client/register/', formData)
+    axios.post(agent.API_ROOT_LOCAL + '/client/register/', formData)
       .then((response) => {
         console.log(response);
         console.log(response.data, 'REGISTERR');
@@ -141,7 +144,6 @@ export default function Login() {
           Sign Up
         </Typography>
         <form className={classes.form} noValidate onSubmit={e => onSubmit(e)}>
-          {/* <CSRFToken /> */}
           {console.log(document.cookie)}
           <Row>
             <Col>
@@ -222,13 +224,13 @@ export default function Login() {
           <FormControl >
             <FormLabel component="legend">User Type</FormLabel>
             <Row>
-              
-                <RadioGroup aria-label="usertype" name="usertype" value={usertype} onChange={handleChange}>
+
+              <RadioGroup aria-label="usertype" name="usertype" value={usertype} onChange={handleChange} row>
                 <Col> <FormControlLabel value="customer" control={<Radio />} label="customer" /> </Col>
                 <Col>  <FormControlLabel value="admin" control={<Radio />} label="admin" /> </Col>
                 <Col>  <FormControlLabel value="retailer" control={<Radio />} label="retailer" /> </Col>
-                </RadioGroup>
-             
+              </RadioGroup>
+
 
             </Row>
 

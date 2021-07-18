@@ -165,25 +165,34 @@ export default function TransferToConsumer(props) {
         console.log('clickedd', customerCard,amount);
         if(userCard && customerCard){
                 var transferData = {
+                    action:'from_customer',
                     from_card_id :userCard['id'],
                     to_card_id :customerCard['id'],
                     // to_card_id : 4,
                     amount_to_be_transferred : amount
                }
                console.log(transferData)
-               agent.DigitalWallet.transfer_money(transferData).then((res)=>{
+               const t = agent.DigitalWallet.transfer_money(transferData)
+               t.then((res)=>{
                    if(res && res.data && res.data['msg']==='Success')
                    {
                     console.log(res);
                     props.setUpdateBalance(true);
-                    toast.success('Money added Succesfully');
+                    toast.success('Money Transferred Succesfully');
                     handleClose();
 
                 }
                 else{
-                    toast.success('Error Transferring Money');
+                    toast.success(res.data['msg']);
                 }
                 //    props.setUpdateHistory(true)
+               }).catch(err=>{
+                   if(err.status==405){
+                       toast.error('User Not verified To make Transaction, Please Verify')
+                   }
+                   else{
+                       toast.error('Permission Denied')
+                   }
                })
             // console.log(props)
 

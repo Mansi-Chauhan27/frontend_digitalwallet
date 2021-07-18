@@ -66,15 +66,7 @@ export default function Retailer() {
 
   useEffect(() => {
 
-    // agent.DigitalWallet.get_cutomers().then((res)=>{
-    //     console.log(res.data,'ygygiy',customerList);
-    //     if(res && res.data)
-    //     {
-    //         setCustomerList(res.data);
-    //         console.log(res.data,'ygygyyyyyyyyyiy',customerList);
-    //     }
-    // });
-
+    
     const t = agent.DigitalWallet.get_devices()
     t.then((res) => {
       console.log(res.data);
@@ -90,35 +82,18 @@ export default function Retailer() {
       }
     });
 
-    //   agent.DigitalWallet.get_owners().then((res)=>{
-    //     console.log(res.data,'ygygiy',ownerList);
-    //     if(res && res.data)
-    //     {
-    //         setOwnerList(res.data);
-    //         console.log(res.data,'ygygyyyyyyyyyiy',ownerList);
-    //     }
-    // });
-
-  }, [update,deviceList])
+  }, [update])
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          {/* <Tab label="Customers" {...a11yProps(0)} /> */}
           <Tab label="Devices" {...a11yProps(0)} />
-          {/* <Tab label="Owners" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-      {/* <TabPanel value={value} index={0}>
-       {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
-      </TabPanel> */}
       <TabPanel value={value} index={0}>
         {deviceList && <Device deviceList={deviceList} setUpdate={setUpdate}/>}
       </TabPanel>
-      {/* <TabPanel value={value} index={2}>
-      {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
-      </TabPanel>*/}
     </div>
   );
 }
