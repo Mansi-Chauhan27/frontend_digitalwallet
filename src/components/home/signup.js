@@ -227,7 +227,7 @@ export default function Signup() {
 
               <RadioGroup aria-label="usertype" name="usertype" value={usertype} onChange={handleChange} row>
                 <Col> <FormControlLabel value="customer" control={<Radio />} label="customer" /> </Col>
-                <Col>  <FormControlLabel value="admin" control={<Radio />} label="admin" /> </Col>
+                {/* <Col>  <FormControlLabel value="admin" control={<Radio />} label="admin" /> </Col> */}
                 <Col>  <FormControlLabel value="retailer" control={<Radio />} label="retailer" /> </Col>
               </RadioGroup>
 

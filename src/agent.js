@@ -58,6 +58,7 @@ const DigitalWallet = {
   redeem_giftcard: (data) => requests.post(`/transaction/giftcardredeem/`, { data: data }),
   add_giftcard: (data) => requests.post(`/transaction/giftcard/`, { data: data }),
   get_giftcard: () => requests.get(`/transaction/giftcard/`),
+  get_balance1: (data,slug) => requests.get(`/transaction/getbalance/${slug}`, { data: data }),
   get_balance: (data) => requests.post(`/transaction/getbalance/`, { data: data }),
   generate_card: (data) => requests.post(`/transaction/generatecard/`, { data: data }),
   generate_otp: () => requests.get(`/client/verifyotp/`),

@@ -22,7 +22,7 @@ const Customer = () => {
     // Get Balance
     useEffect(()=>{
         console.log(updateBalance);
-        const x = agent.DigitalWallet.get_balance({'action':'get_balance','user_id':65});
+        const x = agent.DigitalWallet.get_balance({'action':'get_balance','user_id':65},2);
         x.then(res=>{
             console.log(res.data)
             if(res && res.data){
