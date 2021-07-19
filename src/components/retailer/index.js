@@ -62,7 +62,6 @@ export default function Retailer() {
       console.log(res.data);
       if (res && res.data) {
         setDeviceList(res.data['data']);
-        console.log(deviceList)
       }
 
     }).catch(err => {

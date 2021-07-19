@@ -7,7 +7,6 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Customers from './customers';
-// import Device from './device';
 import agent from '../../agent';
 import Owners from './owners';
 import { toast } from 'react-toastify';
@@ -64,14 +63,13 @@ export default function Dashboard() {
     setValue(newValue);
   };
 
+  // API CAll to get all the customers/owners list
   useEffect(() => {
 
     const t = agent.DigitalWallet.get_cutomers()
     t.then((res) => {
-      console.log(res.data, 'ygygiy', customerList);
       if (res && res.data) {
         setCustomerList(res.data);
-        console.log(res.data, 'ygygyyyyyyyyyiy', customerList);
       }
     }).catch(err => {
       if (err.status === 405 || err.status === 403) {
@@ -79,22 +77,11 @@ export default function Dashboard() {
       }
     });
 
-    // agent.DigitalWallet.get_devices().then((res)=>{
-    //     console.log(res.data);
-    //     if(res && res.data)
-    //     {
-    //         setDeviceList(res.data['data']);
-    //         console.log(deviceList)
-    //     }
-
-    // });
 
     const y = agent.DigitalWallet.get_owners()
     y.then((res) => {
-      console.log(res.data, 'ygygiy', ownerList);
       if (res && res.data) {
         setOwnerList(res.data);
-        console.log(res.data, 'ygygyyyyyyyyyiy', ownerList);
       }
     }).catch(err => {
       if (err.status === 405 || err.status === 403) {
@@ -109,16 +96,13 @@ export default function Dashboard() {
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Customers" {...a11yProps(0)} />
-          {/* <Tab label="Devices" {...a11yProps(1)} /> */}
           <Tab label="Retailers" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
         {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
       </TabPanel>
-      {/* <TabPanel value={value} index={1}>
-       {deviceList && <Device deviceList ={deviceList} />}
-      </TabPanel> */}
+
       <TabPanel value={value} index={1}>
         {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
       </TabPanel>

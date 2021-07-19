@@ -179,7 +179,7 @@ export default function TransferToConsumer(props) {
                 }
                 //    props.setUpdateHistory(true)
                }).catch(err=>{
-                   if(err.status==405){
+                   if(err.status===405){
                        toast.error('User Not verified To make Transaction, Please Verify')
                    }
                    else{

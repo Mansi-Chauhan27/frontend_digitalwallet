@@ -13,7 +13,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 
 import Button from '@material-ui/core/Button';
-import { Row, Col } from 'react-bootstrap';
+// import { Row, Col } from 'react-bootstrap';
 import agent from '../../agent';
 import { toast } from "react-toastify";
 import TextField from '@material-ui/core/TextField';
@@ -105,7 +105,7 @@ export default function AddDevice(props) {
                 }
                 handleClose();
             }).catch(err=>{
-                if(err.status == 405){
+                if(err.status === 405){
                     toast.error('User Not verified To add A device, Please Verify')
                 }
                 else{

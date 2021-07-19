@@ -32,7 +32,7 @@ import StatusFormatter from "../common/statusFormatter";
 import './style.css';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
+// import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 
 
 
@@ -116,34 +116,31 @@ const Customers = props => {
     useEffect(() => {
         if(open){
 
-        }
+        
         const r = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 });
         r.then((res) => {
-            console.log(res.data['data']);
             if (res && res.data) {
-                console.log(res.data)
                 setUserCardsList(res.data['data'])
                 // setRes(true);
             }
         }).catch(er => {
-            console.log('WHATTA');
         });
         const x = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_by_id', 'userid': selctedUserId })
         x.then((res) => {
-            console.log(res.data);
             if (res && res.data) {
-                console.log(res.data['data'])
                 setCustomerCardsList(res.data['data'])
             }
         }).catch(er => {
-            if(er.status===403 || er.status == 405){
+            if(er.status===403 || er.status === 405){
                 toast.error('Permission Denied');
             }
             else{
                 toast.error('Something Went Wrong');
             }
         });
-    }, [open])
+
+    }
+    }, [open,selctedUserId])
 
 
     const handleOpenModal = () => {
@@ -229,10 +226,10 @@ const Customers = props => {
 
     const { SearchBar } = Search;
 
-    const selectOptions = {
-        0: 'Active',
-        1: 'In Active',
-      };
+    // const selectOptions = {
+    //     0: 'Active',
+    //     1: 'In Active',
+    //   };
 
     // Columns
     const columns = [

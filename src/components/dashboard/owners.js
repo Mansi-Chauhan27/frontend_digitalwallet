@@ -23,7 +23,7 @@ const Owners = props => {
     // Set owners list
     useEffect(() => {
         setCustomerList(props.customerList)
-    }, [])
+    }, [props.customerList])
 
 
 

@@ -52,18 +52,18 @@ export default function History(props) {
     setExpanded(!expanded);
   };
   
+  // Set Users Card List
   useEffect(() => {
-    console.log(props)
     setUserCardsList(props.userCardsList);
   }, [props.userCardsList])
 
+  // Get History
   useEffect(() => {
     if (userCard !== '') {
       const t = agent.DigitalWallet.get_balance({ 'action': 'get_history', 'user_id': 65, 'card_id': userCard['id'] })
       t.then((res) => {
         console.log(res.data)
         if (res && res.data) {
-          console.log(res.data['data'])
           setHistoryList(res.data['data'])
         }
       }).catch(err=>{
@@ -77,6 +77,7 @@ export default function History(props) {
     }
   }, [userCard])
 
+  // Status Formatter for debit/credit status
   function statusFormatter(cell, row) {
     if (row.status==='Debit') {
       return (
@@ -107,16 +108,17 @@ export default function History(props) {
       dataField: "source",
       text: "source"
     },
-    // {
-    //     dataField: "stat",
-    //     text: "Device"
-    // },
+    {
+        dataField: "created_at",
+        text: "Date Time"
+    },
     // {
     //     dataField: "updated_at",
     //     text: "Date"
     // },
 
   ];
+
   const handleChangeModalUser = (event) => {
     setUserCard(event.target.value);
   };
