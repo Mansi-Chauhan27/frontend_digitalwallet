@@ -6,10 +6,12 @@ import reportWebVitals from './reportWebVitals';
 // import Login from './components/home/login'
 
 ReactDOM.render(
-  <React.StrictMode>
+  <React.Fragment>
+    {/* <div> */}
     <App />
+    {/* </div> */}
     {/* <Home /> */}
-  </React.StrictMode>,
+  </React.Fragment>,
   document.getElementById('root')
 );
 

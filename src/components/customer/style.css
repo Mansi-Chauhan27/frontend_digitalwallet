@@ -1,0 +1,11 @@
+@media only screen and (max-width: 600px) {
+    InputLabel {
+      color: blue !important;
+    }
+  }
+
+  @media only screen and (max-width: 600px) { 
+    .label {
+      color: blue !important;
+    }
+ }

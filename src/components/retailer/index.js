@@ -1,14 +1,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Customers from './customers';
+import { makeStyles, AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core';
+import Device from './device';
 import agent from '../../agent';
-import Owners from './owners';
 import { toast } from 'react-toastify';
 
 function TabPanel(props) {
@@ -51,41 +45,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Retailer() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
-  const [customerList, setCustomerList] = React.useState([]);
-  const [ownerList, setOwnerList] = React.useState([]);
-  // const [deviceList, setDeviceList] = React.useState([]);
+  const [deviceList, setDeviceList] = React.useState([]);
   const [update, setUpdate] = React.useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  // API CAll to get all the customers/owners list
+  // To Get All The Devices of the logged in Retailer
   useEffect(() => {
-
-    const t = agent.DigitalWallet.get_cutomers()
+    const t = agent.DigitalWallet.get_devices()
     t.then((res) => {
+      console.log(res.data);
       if (res && res.data) {
-        setCustomerList(res.data);
+        setDeviceList(res.data['data']);
       }
-    }).catch(err => {
-      if (err.status === 405 || err.status === 403) {
-        toast.error('Permission Denied to Access Customers')
-      }
-    });
 
-
-    const y = agent.DigitalWallet.get_owners()
-    y.then((res) => {
-      if (res && res.data) {
-        setOwnerList(res.data);
-      }
     }).catch(err => {
+      console.log(err.status);
       if (err.status === 405 || err.status === 403) {
-        toast.error('Permission Denied to access Reatilers')
+        toast.error('Permission Denied')
       }
     });
 
@@ -95,16 +77,11 @@ export default function Dashboard() {
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Customers" {...a11yProps(0)} />
-          <Tab label="Retailers" {...a11yProps(1)} />
+          <Tab label="Devices" {...a11yProps(0)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
-      </TabPanel>
-
-      <TabPanel value={value} index={1}>
-        {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
+        {deviceList && <Device deviceList={deviceList} setUpdate={setUpdate} />}
       </TabPanel>
     </div>
   );
