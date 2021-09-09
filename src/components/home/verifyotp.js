@@ -19,6 +19,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Row, Col } from 'react-bootstrap';
 import agent from '../../agent';
+import ButtonAppBarStart from '../common/buttonappbarstart';
 
 function Copyright() {
   return (
@@ -97,7 +98,7 @@ export default function VerifyOtp() {
         console.log(response);
         console.log(response.data);
 
-        // localStorage.setItem('token', response.data['token']);
+        // localStorage.setItem('is_verified', true);
         // setTimeout(function(){ setButtonDisabled(false) }, 3000);
         setIslogin(true)
 
@@ -114,6 +115,9 @@ export default function VerifyOtp() {
   }
 
   return (
+    <React.Fragment>
+      <ButtonAppBarStart />
+    
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -121,7 +125,7 @@ export default function VerifyOtp() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Verify Your Account
         </Typography>
         <form className={classes.form} noValidate onSubmit={e => onSubmit(e)}>
 
@@ -187,5 +191,6 @@ export default function VerifyOtp() {
         <Copyright />
       </Box>
     </Container>
+    </React.Fragment>
   );
 }

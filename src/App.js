@@ -4,7 +4,7 @@ import Login from './components/home/login'
 import Signup from './components/home/signup'
 import VerifyOtp from './components/home/verifyotp';
 import Dashboard from './components/dashboard/index';
-import ButtonAppBar from './components/common/buttonappbar';
+// import ButtonAppBar from './components/common/buttonappbar';
 import Customer from './components/customer';
 import { ToastContainer } from "react-toastify";
 import Retailer from './components/retailer';
@@ -40,7 +40,7 @@ class App extends Component {
     <Router>
         <div style={{height:'100%'}}>
           {/* {console.log()} */}
-          <ButtonAppBar />
+          {/* <ButtonAppBar /> */}
           <Switch>
               <Route exact path='/' component={Login} />
              {/* { comp && <Route path='/dashboard' component={comp}/>} */}

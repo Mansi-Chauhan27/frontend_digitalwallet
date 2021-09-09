@@ -17,6 +17,7 @@ import agent from '../../agent';
 import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 import { isIterableArray } from '../common/utils';
 import { toast } from 'react-toastify';
+import Loader from '../common/loader';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +49,7 @@ export default function History(props) {
   const [openModalUser, setOpenModalUser] = React.useState(false);
   const [userCard, setUserCard] = React.useState('');
   const [userCardsList, setUserCardsList] = React.useState([]);
+  const [loader, setLoader]  = React.useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -61,12 +63,15 @@ export default function History(props) {
   useEffect(() => {
     if (userCard !== '') {
       const t = agent.DigitalWallet.get_balance({ 'action': 'get_history', 'user_id': 65, 'card_id': userCard['id'] })
+      setLoader(true);
       t.then((res) => {
+        setLoader(false);
         console.log(res.data)
         if (res && res.data) {
           setHistoryList(res.data['data'])
         }
       }).catch(err=>{
+        setLoader(false);
         if(err.status===404){
           toast.info('No Transaction Made')
         }
@@ -101,12 +106,12 @@ export default function History(props) {
     },
     {
       dataField: "status",
-      text: "status",
+      text: "Status",
       formatter: statusFormatter
     },
     {
       dataField: "source",
-      text: "source"
+      text: "Source"
     },
     {
         dataField: "created_at",
@@ -188,6 +193,7 @@ export default function History(props) {
               </FormControl>
             </div>
             <br />
+            {!loader?
             <div>
               <BootstrapTable
                 keyField="id"
@@ -199,7 +205,10 @@ export default function History(props) {
                 condensed
               />
             </div>
-          </div>
+        :
+        <Loader />
+        }    
+      </div>
         </CardContent>
       </Collapse>
     </Card>

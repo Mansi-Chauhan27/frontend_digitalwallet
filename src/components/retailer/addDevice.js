@@ -17,6 +17,7 @@ import Button from '@material-ui/core/Button';
 import agent from '../../agent';
 import { toast } from "react-toastify";
 import TextField from '@material-ui/core/TextField';
+import Loader from '../common/loader';
 
 
 
@@ -74,6 +75,7 @@ export default function AddDevice(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const [deviceName, setDeviceName] = React.useState('');
+    const [loader, setLoader] =  React.useState(false);
     
 
     const handleChangeModal = (event) => {
@@ -95,23 +97,31 @@ export default function AddDevice(props) {
         if (deviceName) {
             console.log(deviceName);
             
-            const t = agent.DigitalWallet.create_device({'device_name':deviceName})
+            const t = agent.DigitalWallet.create_device({'device_name':deviceName});
+            setLoader(true);
             t.then((res) => {
+                setLoader(false);
                 console.log(res);
                 if(res || res.data){
                     // props.setUpdate(true)
                     console.log(props)
                     toast.success('Device added Succesfully');
+                    handleClose();
+                    console.log(props);
+                    props.setUpdate(true);
                 }
-                handleClose();
+                
             }).catch(err=>{
+                console.log(err)
+                setLoader(false);
                 if(err.status === 405){
                     toast.error('User Not verified To add A device, Please Verify')
                 }
                 else{
-                    toast.error('Something Went Wrong')
+                    toast.error('Something Went Wrong CD')
                 }
             })
+            
             console.log(props)
 
             
@@ -159,7 +169,8 @@ export default function AddDevice(props) {
                             <h2 id="transition-modal-title">Add Device</h2>
 
                        
-                        <div style={{alignItems:'center'}}>
+                        {!loader?
+                            <div style={{alignItems:'center'}}>
                             <div>
                                 {/* <FormControl className={classes.formControl} style={{ width: '50%' }}>
                                     <InputLabel id="demo-controlled-open-select-label">Device Name</InputLabel> */}
@@ -194,7 +205,7 @@ export default function AddDevice(props) {
 
                             </div>
                         </div>
-
+                        :<Loader/>}
                     </div>
                 </Fade>
 

@@ -14,8 +14,13 @@ import {
   Box,
   Typography,
   makeStyles,
-  Container
+  Container,
+  InputAdornment,
+  IconButton,
 } from '@material-ui/core';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import axios from 'axios';
@@ -23,6 +28,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { Redirect } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 import agent from '../../agent';
+import ButtonAppBarStart from '../common/buttonappbarstart';
 
 function Copyright() {
   return (
@@ -63,7 +69,12 @@ export default function Signup() {
 
   const [islogin, setIslogin] = useState(false)
   const [usertype, setUsertype] = React.useState('customer');
-
+  // const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [values, setValues] = React.useState({
+    password: '',
+    password2:'',
+  });
   const classes = useStyles();
 
   // Submit Method
@@ -97,7 +108,9 @@ export default function Signup() {
 
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post(agent.API_ROOT_LOCAL + '/client/register/', formData)
+    if(e.target.email.value && e.target.firstname.value && e.target.password.value && e.target.password2.value && e.target.usertype.value)
+    {
+      axios.post(agent.API_ROOT_LOCAL + '/client/register/', formData)
       .then((response) => {
         console.log(response);
         console.log(response.data, 'REGISTERR');
@@ -106,7 +119,7 @@ export default function Signup() {
         localStorage.setItem('token', response.data['token']);
         localStorage.setItem('is_admin', response.data['is_admin']);
         localStorage.setItem('user_type', response.data['user_type']);
-
+        localStorage.setItem('is_verified', response.data['is_verified']);
         // <Link to={{ pathname: `/dashboard` }}></Link>
         // window.location = '/dashboard';
         // return <Redirect to="/dashboard" />
@@ -120,6 +133,7 @@ export default function Signup() {
           toast.error('Password: ' + error.response.data['password'][0]);
 
       });
+    }
   }
 
   if (islogin) {
@@ -128,12 +142,29 @@ export default function Signup() {
   }
 
 
-  const handleChange = (event) => {
+  const handleChange  =(event) => {
     setUsertype(event.target.value);
+  };
+
+  const handleChangePassword = (prop) => (event) => {
+    console.log(prop);
+    // prop(event.target.value);
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
 
   return (
+    <React.Fragment>
+      <ButtonAppBarStart />
+    
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -143,14 +174,14 @@ export default function Signup() {
         <Typography component="h1" variant="h5">
           Sign Up
         </Typography>
-        <form className={classes.form} noValidate onSubmit={e => onSubmit(e)}>
+        <form className={classes.form} onSubmit={e => onSubmit(e)}>
           {console.log(document.cookie)}
           <Row>
             <Col>
               <TextField
                 variant="outlined"
                 margin="normal"
-                required
+                required={true}
                 fullWidth
                 id="firstname"
                 label="Firstname"
@@ -170,7 +201,7 @@ export default function Signup() {
                 label="Lastname"
                 name="lastname"
                 autoComplete="lastname"
-                autoFocus
+                // autoFocus
               />
             </Col>
           </Row>
@@ -185,7 +216,7 @@ export default function Signup() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                autoFocus
+                // autoFocus
               />
 
             </Col>
@@ -200,9 +231,29 @@ export default function Signup() {
                 fullWidth
                 name="password"
                 label="Password"
-                type="password"
+                // type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
                 autoComplete="current-password"
+                value={values.password}
+                onChange={handleChangePassword('password')}
+                
+                InputProps={{
+  
+                  startAdornment:
+                  <InputAdornment position="end" style={{marginLeft:'0px'}}>
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>,
+                style:{paddingLeft:'0px'},
+                
+                }}
+                
               />
             </Col>
             <Col>
@@ -213,9 +264,26 @@ export default function Signup() {
                 fullWidth
                 name="password2"
                 label="Confirm Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password2"
                 autoComplete="current-password"
+                value={values.password2}
+                onChange={handleChangePassword('password2')} 
+                InputProps={{
+  
+                  startAdornment:
+                  <InputAdornment position="end" style={{marginLeft:'0px'}}>
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>,
+                style:{paddingLeft:'0px'},
+                
+                }}
               />
             </Col>
           </Row>
@@ -264,5 +332,6 @@ export default function Signup() {
         <Copyright />
       </Box>
     </Container>
+    </React.Fragment>
   );
 }

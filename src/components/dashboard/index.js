@@ -10,6 +10,8 @@ import Customers from './customers';
 import agent from '../../agent';
 import Owners from './owners';
 import { toast } from 'react-toastify';
+import ButtonAppBar from '../common/buttonappbar';
+import Loader from '../common/loader';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -57,7 +59,12 @@ export default function Dashboard() {
   const [customerList, setCustomerList] = React.useState([]);
   const [ownerList, setOwnerList] = React.useState([]);
   // const [deviceList, setDeviceList] = React.useState([]);
-  const [update, setUpdate] = React.useState(false);
+  const [updateCustomers, setUpdateCustomers] = React.useState(false);
+  const [updateOwners, setUpdateOwners] = React.useState(false);
+  const [loader, setLoader] = React.useState(false);
+  const [customerResponse, setCustomerResponse] = React.useState(null);
+  const [customerOffset, setCustomerOffset] = React.useState(10);
+  const [ownerOffset, setOwnerOffset] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -66,32 +73,47 @@ export default function Dashboard() {
   // API CAll to get all the customers/owners list
   useEffect(() => {
 
-    const t = agent.DigitalWallet.get_cutomers()
+    const t = agent.DigitalWallet.get_cutomers_list(6,customerOffset)
+    setLoader(true)
     t.then((res) => {
-      if (res && res.data) {
-        setCustomerList(res.data);
+      console.log(res)
+      if (res && res.results) {
+        setLoader(false)
+        setCustomerList(res.results);
+        setCustomerResponse(res);
       }
     }).catch(err => {
+      setLoader(false);
       if (err.status === 405 || err.status === 403) {
         toast.error('Permission Denied to Access Customers')
       }
     });
 
 
-    const y = agent.DigitalWallet.get_owners()
+  }, [updateCustomers, customerOffset])
+
+  useEffect(() => {
+
+    const y = agent.DigitalWallet.get_owners_list(6,ownerOffset)
+    setLoader(true)
     y.then((res) => {
-      if (res && res.data) {
-        setOwnerList(res.data);
+      if (res && res.results) {
+        setLoader(false);
+        setOwnerList(res.results);
       }
     }).catch(err => {
+      setLoader(false);
       if (err.status === 405 || err.status === 403) {
+
         toast.error('Permission Denied to access Reatilers')
       }
     });
 
-  }, [update])
+  }, [updateOwners,ownerOffset])
 
   return (
+    <React.Fragment>
+      <ButtonAppBar></ButtonAppBar>
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
@@ -100,12 +122,24 @@ export default function Dashboard() {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        {customerList && <Customers customerList={customerList} setUpdate={setUpdate} />}
+        {!loader?
+        <div>
+        {customerList && customerResponse && <Customers customerList={customerList} setUpdate={setUpdateCustomers} customerResponse={customerResponse} setCustomerOffset={setCustomerOffset} />}
+        </div>
+        :
+        <Loader/>
+        }
       </TabPanel>
 
       <TabPanel value={value} index={1}>
-        {ownerList && <Owners customerList={ownerList} setUpdate={setUpdate} />}
+        {!loader?
+        <div>
+        {ownerList && <Owners customerList={ownerList} setUpdate={setUpdateOwners} setOwnerOffset={setOwnerOffset} />}
+        </div>:
+        <Loader />
+        }
       </TabPanel>
     </div>
+    </React.Fragment>
   );
 }

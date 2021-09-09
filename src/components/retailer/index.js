@@ -4,6 +4,8 @@ import { makeStyles, AppBar, Tabs, Tab, Typography, Box } from '@material-ui/cor
 import Device from './device';
 import agent from '../../agent';
 import { toast } from 'react-toastify';
+import ButtonAppBar from '../common/buttonappbar';
+import Loader from '../common/loader';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -50,6 +52,7 @@ export default function Retailer() {
   const [value, setValue] = React.useState(0);
   const [deviceList, setDeviceList] = React.useState([]);
   const [update, setUpdate] = React.useState(false);
+  const [loader, setLoader] = React.useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -57,14 +60,17 @@ export default function Retailer() {
 
   // To Get All The Devices of the logged in Retailer
   useEffect(() => {
-    const t = agent.DigitalWallet.get_devices()
+    const t = agent.DigitalWallet.get_devices();
+    setLoader(true);
     t.then((res) => {
+      setLoader(false);
       console.log(res.data);
       if (res && res.data) {
         setDeviceList(res.data['data']);
       }
 
     }).catch(err => {
+      setLoader(false);
       console.log(err.status);
       if (err.status === 405 || err.status === 403) {
         toast.error('Permission Denied')
@@ -74,6 +80,8 @@ export default function Retailer() {
   }, [update])
 
   return (
+    <React.Fragment>
+      <ButtonAppBar />
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
@@ -81,8 +89,9 @@ export default function Retailer() {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        {deviceList && <Device deviceList={deviceList} setUpdate={setUpdate} />}
+        {!loader ? deviceList && <Device deviceList={deviceList} setUpdate={setUpdate} />: <Loader/>}
       </TabPanel>
     </div>
+    </React.Fragment>
   );
 }

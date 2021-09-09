@@ -6,35 +6,35 @@ import {
 } from 'reactstrap';
 import Flex from './flex';
 // import 'font-awesome/css/font-awesome.min.css';
-const StatusFormatter = ({ status, component }) => {
-    console.log(status,component)
+const StatusFormatterDevice = ({ status, component, api_keys }) => {
+    console.log(status,component, api_keys)
     let color = '';
     let text = '';
     let icon = '';
-    switch (status) {
+    // switch (status) {
         
-        case true:
-            color = 'success';
-            text = 'Active';
-            // icon = 'check';
-            break;
-        default:
-            color = 'secondary';
-            text = 'In Active';
-            // icon = 'ban';
+    //     case true:
+    //         color = 'success';
+    //         text = 'Active';
+    //         // icon = 'check';
+    //         break;
+    //     default:
+    //         color = 'secondary';
+    //         text = 'In Active';
+    //         // icon = 'ban';
+    // }
+    if(status===true && api_keys){
+        color='success';
+        text='Active';
     }
-    // if(status===true && api_keys){
-    //     color='success';
-    //     text='Active';
-    // }
-    // else if(status===false && api_keys.length===0){
-    //     color = 'secondary';
-    //     text='Generate Key';
-    // }
-    // else{
-    //     color = 'secondary';
-    //     text = 'In Active';
-    // }
+    else if(status===false && api_keys.length===0){
+        color = 'secondary';
+        text='Generate Key';
+    }
+    else{
+        color = 'secondary';
+        text = 'In Active';
+    }
     return (
         <div>
             {component === 'timeline' ? <CardHeader className={`border-bottom p-3 bg-soft-${color}`}>
@@ -56,4 +56,4 @@ const StatusFormatter = ({ status, component }) => {
     );
 };
 
-export default StatusFormatter;
+export default StatusFormatterDevice;

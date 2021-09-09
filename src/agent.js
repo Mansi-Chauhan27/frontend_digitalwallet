@@ -4,7 +4,7 @@ import _superagent from 'superagent';
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
-const API_ROOT_LOCAL = 'http://127.0.0.1:8002';
+const API_ROOT_LOCAL = 'http://127.0.0.1:8000';
 const API_ROOT = API_ROOT_LOCAL;
 const responseBody = res => res.body;
 
@@ -65,6 +65,9 @@ const DigitalWallet = {
   get_cards: (data) => requests.post(`/transaction/getcards/`, { data: data }),
   login_using_token: (data) => requests.post(`/api-token-auth/`, { data: data }),
   get_owners: () => requests.get(`/client/owners/`),
+  logout: () => requests.get(`/client/logout/`),
+  get_cutomers_list: (limit,offset)=> requests.get(`/client/getcustomers/?limit=${limit}&offset=${offset}`),
+  get_owners_list: (limit,offset)=> requests.get(`/client/getowners/?limit=${limit}&offset=${offset}`),
 
 
   get_balance1: (data,slug) => requests.get(`/transaction/getbalance/?page_size=${slug}`, { data: data }),

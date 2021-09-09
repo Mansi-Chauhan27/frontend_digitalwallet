@@ -17,10 +17,12 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { Row, Col } from 'react-bootstrap';
 import agent from '../../agent';
-import {  toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { isIterableArray } from '../common/utils';
 import TextField from '@material-ui/core/TextField';
 import './style.css'
+import Loader from '../common/loader';
+import { CardFormatter } from '../common/cardFormatter';
 
 
 
@@ -72,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
     },
     input: {
         borderRadius: '0px',
-        height:'34px'
+        height: '34px'
     }
 }));
 
@@ -90,15 +92,19 @@ export default function TransferToConsumer(props) {
     const [openModal, setOpenModal] = React.useState(false);
     const [openModalUser, setOpenModalUser] = React.useState(false);
     const [amount, setAmount] = React.useState(0);
+    const [loader, setLoader] = React.useState(false);
 
     // const [giftCardList, setGiftCardList] = React.useState([]);
 
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         setCustomerCardsList(props.customerCardsList);
         setUserCardsList(props.userCardsList);
-    },[props])
-    
+        console.log(props.userCardsList);
+        props.userCardsList.length===1 ? setUserCard(props.userCardsList[0]): setUserCard('');
+        props.customerCardsList.length===1 ? setCustomerCard(props.customerCardsList[0]): setCustomerCard('')
+    }, [props])
+
     // GET CARDS
     // useEffect(() => {
     //     agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 }).then((res) => {
@@ -118,10 +124,12 @@ export default function TransferToConsumer(props) {
     // }, [])
 
     const handleChangeModal = (event) => {
+        console.log(event.target.value)
         setCustomerCard(event.target.value);
     };
 
     const handleChangeModalUser = (event) => {
+        console.log(event.target.value)
         setUserCard(event.target.value);
     };
 
@@ -155,45 +163,49 @@ export default function TransferToConsumer(props) {
 
     // Transfer Money
     const onClickButton = () => {
-        if(userCard && customerCard){
-                var transferData = {
-                    action:'from_customer',
-                    from_card_id :userCard['id'],
-                    to_card_id :customerCard['id'],
-                    // to_card_id : 4,
-                    amount_to_be_transferred : amount
-               }
-               console.log(transferData)
-               const t = agent.DigitalWallet.transfer_money(transferData)
-               t.then((res)=>{
-                   if(res && res.data && res.data['msg']==='Success')
-                   {
+        if (userCard && customerCard) {
+            var transferData = {
+                action: 'from_customer',
+                from_card_id: userCard['id'],
+                to_card_id: customerCard['id'],
+                // to_card_id : 4,
+                amount_to_be_transferred: amount
+            }
+            console.log(transferData)
+            const t = agent.DigitalWallet.transfer_money(transferData)
+            setLoader(true);
+            t.then((res) => {
+                setLoader(false);
+                if (res && res.data && res.data['msg'] === 'Success') {
                     console.log(res);
                     props.setUpdateBalance(true);
                     toast.success('Money Transferred Succesfully');
                     handleClose();
 
                 }
-                else{
+                else {
                     toast.success(res.data['msg']);
                 }
                 //    props.setUpdateHistory(true)
-               }).catch(err=>{
-                   if(err.status===405){
-                       toast.error('User Not verified To make Transaction, Please Verify')
-                   }
-                   else{
-                       toast.error('Permission Denied')
-                   }
-               })
+            }).catch(err => {
+                setLoader(false);
+                if (err.status === 405) {
+                    toast.error('User Not verified To make Transaction, Please Verify')
+                }
+                else {
+                    toast.error('Permission Denied')
+                }
+            })
             // console.log(props)
 
-              
+
         }
-        else{
-            toast.error('Please Select Gift Card')
+        else {
+            toast.error('Please Card')
         }
     }
+
+
 
     return (
         <div>
@@ -214,7 +226,7 @@ export default function TransferToConsumer(props) {
 
             </Card>
 
-            <Modal 
+            <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 className={classes.modal}
@@ -227,11 +239,13 @@ export default function TransferToConsumer(props) {
                 }}
             >
                 <Fade in={open}>
-                    <div className={classes.paper} style={{display:'inline-table'}}>
+                    <div className={classes.paper} style={{ display: 'inline-table' }}>
                         <h2 id="transition-modal-title">Transfer Money to Customer</h2>
                         <br />
-                        <Row xxs="2">
-                            {/* <Col>
+                        {!loader ?
+                            <div>
+                                <Row xxs="2">
+                                    {/* <Col>
                                 <FormControl className={classes.formControl} style={{ width: '50%' }}>
                                 <InputLabel id="demo-controlled-open-select-label">Select Gift Card</InputLabel>
 
@@ -263,109 +277,117 @@ export default function TransferToConsumer(props) {
                                 </FormControl>
 
                             </Col> */}
-                            <Col xs="12" md="6">
-                                <FormControl className={classes.formControl} style={{ width: '100%' }}>
-                                    <InputLabel id="demo-controlled-open-select-label1" className='label'>Select Your Card</InputLabel>
+                                    <Col xs="12" md="6">
+                                        {isIterableArray(userCardsList) && <FormControl className={classes.formControl} style={{ width: '100%' }}>
+                                            <InputLabel id="demo-controlled-open-select-label1" className='label'>Select Your Card</InputLabel>
 
-                                    <Select
-                                        labelId="demo-controlled-open-select-label1"
-                                        id="demo-controlled-open-select1"
-                                        open={openModalUser}
-                                        onClose={handleCloseModalUSer}
-                                        onOpen={handleOpenModalUser}
-                                        value={userCard}
-                                        onChange={handleChangeModalUser}
-                                    >
-                                        <MenuItem value="Select Gift Card">
+                                            <Select
+                                                labelId="demo-controlled-open-select-label1"
+                                                id="demo-controlled-open-select1"
+                                                open={openModalUser}
+                                                onClose={handleCloseModalUSer}
+                                                onOpen={handleOpenModalUser}
+                                                value={userCard}
+                                                // defaultValue={userCardsList[0]['card_number']}
+                                                onChange={handleChangeModalUser}
+                                                defaultValue="" 
+
+                                            >
+                                                {/* <MenuItem value="Select Card">
                                             <em>None</em>
-                                        </MenuItem>
+                                        </MenuItem> */}
 
-                                        {isIterableArray(userCardsList) &&
-                                            userCardsList.map((user_card, index) => {
-                                                return (
-                                                    <option key={index} value={user_card} >
-                                                        {user_card['card_number']}
-                                                    </option>
-                                                )
-                                            }
-                                            )}
-                                    </Select>
-
-
-                                </FormControl>
-
-                            </Col>
-                            <Col xs="12" md="6">
-                                <FormControl className={classes.formControl} style={{ width: '100%' }}>
-                                    <InputLabel id="demo-controlled-open-select-label2">To Card</InputLabel>
-
-                                    <Select
-                                        labelId="demo-controlled-open-select-label2"
-                                        id="demo-controlled-open-select2"
-                                        open={openModal}
-                                        onClose={handleCloseModal}
-                                        onOpen={handleOpenModal}
-                                        value={customerCard}
-                                        onChange={handleChangeModal}
-                                    >
-                                        <MenuItem value="Select Gift Card">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        {console.log(customerCardsList)}
-                                        {isIterableArray(customerCardsList) &&
-                                            customerCardsList.map((customer_card, index) => {
-                                                return (
-                                                    <option key={index} value={customer_card} >
-                                                        {customer_card['card_number']}
-                                                    </option>
-                                                )
-                                            }
-                                            )}
-                                    </Select>
+                                                {isIterableArray(userCardsList) &&
+                                                    userCardsList.map((user_card, index) => {
+                                                        return (
+                                                            <MenuItem key={index} value={user_card} style={{ cursor: 'pointer' }} >
+                                                                {CardFormatter(user_card['card_number'].toString())}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                    )}
+                                            </Select>
 
 
-                                </FormControl>
+                                        </FormControl>
+                                        }
+                                    </Col>
+                                    <Col xs="12" md="6">
+                                        <FormControl className={classes.formControl} style={{ width: '100%' }}>
+                                            <InputLabel id="demo-controlled-open-select-label2">To Card</InputLabel>
 
-                            </Col>
+                                            <Select
+                                                labelId="demo-controlled-open-select-label2"
+                                                id="demo-controlled-open-select2"
+                                                open={openModal}
+                                                onClose={handleCloseModal}
+                                                onOpen={handleOpenModal}
+                                                value={customerCard}
+                                                onChange={handleChangeModal}
+                                                defaultValue="" 
 
-                        </Row>
-                        <br />
-                        <Row style={{alignItems:'center'}} xs="2"> 
-                        <Col xs="12" md="6">
-                           <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="amount"
-                                label="Amount"
-                                id="amount"
-                                autoComplete="amount"
-                                value={amount}
-                                onChange={handleChangeAmount}
-                                InputProps={{
-                                    className: classes.input,
-                                }}
-                                
-                            />
-                           </Col>
-                            <Col xs="12" md="6">
+                                            >
+                                                <MenuItem value="Select Card">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                {/* {console.log(customerCardsList)} */}
+                                                {isIterableArray(customerCardsList) &&
+                                                    customerCardsList.map((customer_card, index) => {
+                                                        return (
+                                                            <MenuItem key={index} value={customer_card} style={{ cursor: 'pointer' }} >
+                                                                {CardFormatter(customer_card['card_number'].toString())}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                    )}
+                                            </Select>
 
-                                <Button
-                                    // type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    // className={classes.submit}
-                                    onClick={onClickButton}
-                                >
-                                    Transfer
-                                </Button>
 
-                            </Col>
-                          
-                        </Row>
+                                        </FormControl>
 
+                                    </Col>
+
+                                </Row>
+                                <br />
+                                <Row style={{ alignItems: 'center' }} xs="2">
+                                    <Col xs="12" md="6">
+                                        <TextField
+                                            variant="outlined"
+                                            margin="normal"
+                                            required
+                                            fullWidth
+                                            name="amount"
+                                            label="Amount"
+                                            id="amount"
+                                            autoComplete="amount"
+                                            value={amount}
+                                            onChange={handleChangeAmount}
+                                            InputProps={{
+                                                className: classes.input,
+                                            }}
+
+                                        />
+                                    </Col>
+                                    <Col xs="12" md="6">
+
+                                        <Button
+                                            // type="submit"
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            // className={classes.submit}
+                                            onClick={onClickButton}
+                                        >
+                                            Transfer
+                                        </Button>
+
+                                    </Col>
+
+                                </Row>
+                            </div>
+                            :
+                            <Loader />
+                        }
                     </div>
                 </Fade>
 

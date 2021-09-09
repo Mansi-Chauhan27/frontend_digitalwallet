@@ -1,5 +1,5 @@
 import React from 'react';
-// import { BrowserRouter as Link } from 'react-router-dom';
+import { BrowserRouter as Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function ButtonAppBar() {
+export default function ButtonAppBarStart() {
 
   const classes = useStyles();
   console.log(window.location.href)
@@ -43,7 +43,6 @@ export default function ButtonAppBar() {
     })
     
   }
-  console.log(localStorage.getItem('is_verified'))
 
   return (
     <div className={classes.root}>
@@ -57,9 +56,7 @@ export default function ButtonAppBar() {
           </Typography>
           {/* <Button color="inherit">Sign Up</Button> */}
           <div>
-          {/* {window.location.href.indexOf('dashboard')>0 ? localStorage.getItem('is_verified')===false ? <Button color="inherit" onClick={()=> history.push("/verifyotp")}>Verify</Button>:<></>  : <Link  id='1' href="#" className="btn btn-primary">Help</Link>} */}
-           {localStorage.getItem('is_verified')==='false' ? <Button color="inherit" onClick={()=> history.push("/verifyotp")}>Verify</Button>:<></> }
-
+          {window.location.href.indexOf('dashboard')>0 ? <Button color="inherit" onClick={()=> history.push("/verifyotp")}>Verify</Button>  : <Link  id='1' href="#" className="btn btn-primary">Help</Link>}
           {window.location.href.indexOf('dashboard')>0 ? <Button color="inherit" onClick={()=> logout()}>Logout</Button>  : <> </>}
 
           </div>

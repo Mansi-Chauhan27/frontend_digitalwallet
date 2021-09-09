@@ -17,6 +17,10 @@ import agent from "../../agent";
 import StatusFormatter from "../common/statusFormatter";
 import AddDevice from "./addDevice";
 import { makeStyles } from '@material-ui/core/styles';
+import './style.css';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+
 
 const products = [
     { id: 1, name: "Item 1", price: 100 },
@@ -64,7 +68,7 @@ const Device = props => {
             text: 'Status',
             headerClasses: 'text-10 align-middle',
             classes: 'align-middle text-10 py-2',
-            formatter: (row, { active }) => (<StatusFormatter status={active} component={'device'} />),
+            formatter: ({active }) => (<StatusFormatter status={active} component={'device'}/>),
         },
         {
             dataField: '',
@@ -92,14 +96,74 @@ const Device = props => {
             csvExport: false,
         }
     ];
+
+    const pageListRenderer = ({
+        pages,
+        onPageChange
+      }) => {
+        // just exclude <, <<, >>, >
+        const pageWithoutIndication = pages.filter(p => typeof p.page !== 'string');
+        
+        console.log('pageWithoutIndication',pageWithoutIndication)
+        console.log('onPageChange',onPageChange)
+        return (
+          <div>
+            {
+              pageWithoutIndication.map(p => (
+                <button className="btn btn-success" onClick={ () => {onPageChange(p.page); console.log(p.page,'sdsda'); props.setCustomerOffset(p.page+5)} }>{ p.page }</button>
+              ))
+            
+            }
+          </div>
+        );
+      };
+      
+    const pagination = paginationFactory({
+    totalSize: totalSize,
+    sizePerPage:5,
+    pageListRenderer:pageListRenderer
+    });
+
     return (
         <div style={{ padding: "20px" }}>
             <div>
             {/* <h1 className="h2">Devices</h1> */}
             <AddDevice />
             </div>
-            
-            <BootstrapTable keyField="id" data={deviceList} columns={columns} />
+            <ToolkitProvider
+                            keyField="id"
+                            data={deviceList}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+
+                        >
+                            {
+                                props => (
+                                    <div>
+
+                                        <div style={{ float: 'right' }}>
+                                            <SearchBar {...props.searchProps} />
+                                        </div>
+                                        <hr />
+                                        <BootstrapTable
+                                            {...props.baseProps}
+                                            striped
+                                            hover
+                                            bootstrap4
+                                            condensed
+                                            wrapperClasses="table-responsive"
+                                            classes={classes.tab}
+                                            headerClasses="bg-200 text-900 border-y border-200"
+                                            pagination={pagination}
+                                        // filter={ filterFactory()}
+
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+
+            {/* <BootstrapTable keyField="id" data={deviceList} columns={columns} /> */}
         </div>
     );
 };

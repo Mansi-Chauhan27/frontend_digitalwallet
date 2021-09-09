@@ -13,12 +13,14 @@ import {
 import { BsThreeDots } from 'react-icons/bs';
 import agent from "../../agent";
 import StatusFormatter  from "../common/statusFormatter";
+import Loader from "../common/loader";
 
 
 
 const Owners = props => {
 
     const [customerList, setCustomerList] = React.useState([]);
+    const [loader, setLoader] = React.useState(false);
 
     // Set owners list
     useEffect(() => {
@@ -54,7 +56,10 @@ const Owners = props => {
     function deavtivateUser(user_id) {
         console.log('deactivatee', user_id);
         if (user_id) {
-            agent.DigitalWallet.update_cutomers({ 'id': user_id }).then((res) => {
+            const t = agent.DigitalWallet.update_cutomers({ 'id': user_id });
+            setLoader(true);
+            t.then((res) => {
+                setLoader(false);
                 console.log(res.data)
                 props.setUpdate(true)
             })
@@ -114,6 +119,7 @@ const Owners = props => {
     const classes = useStyles();
     return (
         <React.Fragment>
+            {!loader?
         <div style={{ padding: "20px;" }} className='col-sm-12'>
             <h1 className="h2">Retailers</h1>
             <div>
@@ -132,6 +138,9 @@ const Owners = props => {
             />
             </div>
         </div>
+         :
+         <Loader/>
+         }
         </React.Fragment>
     );
 };

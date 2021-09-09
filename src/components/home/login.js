@@ -17,6 +17,7 @@ import { Redirect } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import agent from '../../agent';
+import ButtonAppBarStart from '../common/buttonappbarstart';
 
 function Copyright() {
   return (
@@ -72,6 +73,8 @@ export default function Login() {
         localStorage.setItem('token', response.data['token']);
         localStorage.setItem('is_admin', response.data['is_admin']);
         localStorage.setItem('user_type', response.data['user_type']);
+        localStorage.setItem('is_verified', response.data['is_verified']);
+
 
         setIslogin(true)
 
@@ -87,6 +90,8 @@ export default function Login() {
   }
 
   return (
+    <React.Fragment>
+      <ButtonAppBarStart />
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -96,7 +101,7 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate onSubmit={e => onSubmit(e)}>
+        <form className={classes.form} onSubmit={e => onSubmit(e)}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -163,5 +168,6 @@ export default function Login() {
         <Copyright />
       </Box>
     </Container>
+    </React.Fragment>
   );
 }

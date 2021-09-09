@@ -14,7 +14,7 @@ import {
 import { BsThreeDots } from 'react-icons/bs';
 // import axios from 'axios';
 import agent from "../../agent";
-import StatusFormatter from "../common/statusFormatter";
+// import StatusFormatter from "../common/statusFormatter";
 import AddDevice from "./addDevice";
 import { toast } from "react-toastify";
 import {
@@ -32,6 +32,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { isIterableArray } from "../common/utils";
 import { red } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
+import Loader from "../common/loader";
+import StatusFormatterDevice from "../common/statusFormatterDevice";
+import { CardFormatter } from "../common/cardFormatter";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -93,6 +96,8 @@ const Device = props => {
     const [open, setOpen] = React.useState(false);
     const [openModal, setOpenModal] = React.useState(false);
     const [amount, setAmount] = React.useState(0);
+    const [loader, setLoader] = React.useState(false);
+    // const[update,setUpdate] = React.useState(false);
 
 
     // To Get All The Devices of the logged in Retailer from props
@@ -106,13 +111,16 @@ const Device = props => {
         if (open) {
 
             const t = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_for_refund', 'userid': 65 })
+            setLoader(true);
             t.then((res) => {
+                setLoader(false);
                 console.log(res.data);
                 if (res && res.data) {
                     console.log(res.data['customers'])
                     setCustomerCardsList(res.data['customers'])
                 }
             }).catch(err => {
+                setLoader(false);
                 if (err.status === 403) { toast.error('Permission Deniesd') }
                 else {
                     toast.error('Something Went Wrong')
@@ -126,8 +134,10 @@ const Device = props => {
     function deactivateDevice(device_id) {
         console.log('deactivatee', device_id);
         if (device_id) {
-            const t = agent.DigitalWallet.deactivate_device({ 'id': device_id })
+            const t = agent.DigitalWallet.deactivate_device({ 'id': device_id });
+            setLoader(true);
             t.then((res) => {
+                setLoader(false);
                 console.log(res.data)
                 if (res || res.data) {
                     props.setUpdate(true);
@@ -135,6 +145,7 @@ const Device = props => {
 
                 }
             }).catch(err => {
+                setLoader(false);
                 toast.error('Something Went Wrong!')
             })
         }
@@ -144,15 +155,18 @@ const Device = props => {
     function generateKey(device_id) {
         console.log('deactivatee', device_id);
         if (device_id) {
-            const t = agent.DigitalWallet.create_device_key({ 'device_id': device_id })
+            const t = agent.DigitalWallet.create_device_key({ 'device_id': device_id });
+            setLoader(true);
             t.then((res) => {
+                setLoader(false);
                 console.log(res.data)
                 if (res || res.data) {
-                    props.setUpdate(true)
                     console.log(res.data['data'])
                     toast.success('Key generated Successfully ' + res.data['data'])
+                    props.setUpdate(true)
                 }
             }).catch(err => {
+                setLoader(false);
                 toast.error('Something Went Wrong!')
             })
         }
@@ -199,8 +213,10 @@ const Device = props => {
                 amount_to_be_transferred: amount
             }
             console.log(transferData)
-            const t = agent.DigitalWallet.transfer_money(transferData)
+            const t = agent.DigitalWallet.transfer_money(transferData);
+            setLoader(true);
             t.then((res) => {
+                setLoader(false);
                 if (res && res.data && res.data['msg'] === 'Success') {
                     console.log(res);
                     // props.setUpdateBalance(true);
@@ -213,6 +229,7 @@ const Device = props => {
                 }
                 //    props.setUpdateHistory(true)
             }).catch(err => {
+                setLoader(false);
                 toast.error('Something Went Wrong')
             })
             // console.log(props)
@@ -237,7 +254,7 @@ const Device = props => {
             text: 'Status',
             headerClasses: 'text-10 align-middle',
             classes: 'align-middle text-10 py-2',
-            formatter: (row, { active }) => (<StatusFormatter status={active} component={'device'} />),
+            formatter: (row, {active,api_keys }) => (<StatusFormatterDevice status={active} component={'device'}  api_keys={api_keys} />),
         },
         {
             dataField: '',
@@ -270,10 +287,13 @@ const Device = props => {
         <div style={{ padding: "20px" }}>
             <div>
                 {/* <h1 className="h2">Devices</h1> */}
-                <AddDevice setUpadte={props.setUpdate} />
+                <AddDevice setUpdate={props.setUpdate} />
             </div>
 
-            <BootstrapTable keyField="id" data={deviceList} columns={columns} />
+            {!loader ?
+                <BootstrapTable keyField="id" data={deviceList} columns={columns} />
+                :
+                <Loader />}
 
 
             <Modal
@@ -292,6 +312,7 @@ const Device = props => {
                     <div className={classes.paper} style={{ display: 'inline-table' }}>
                         <h2 id="transition-modal-title">Transfer Money to Customer</h2>
                         <br />
+                        {!loader?<div>
                         <Row>
                             <Col>
                                 <FormControl className={classes.formControl} style={{ width: '50%' }}>
@@ -314,7 +335,7 @@ const Device = props => {
                                             customerCardsList.map((customer_card, index) => {
                                                 return (
                                                     <option key={index} value={customer_card} >
-                                                        {customer_card['card_number']}
+                                                        {CardFormatter(customer_card['card_number'].toString())}
                                                     </option>
                                                 )
                                             }
@@ -359,7 +380,8 @@ const Device = props => {
                             </Col>
 
                         </Row>
-
+                        </div>
+                        :<Loader/>}
                     </div>
                 </Fade>
 

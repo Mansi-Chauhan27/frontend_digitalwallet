@@ -32,6 +32,8 @@ import StatusFormatter from "../common/statusFormatter";
 import './style.css';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import Loader from "../common/loader";
+import { CardFormatter } from "../common/cardFormatter";
 // import filterFactory, { selectFilter } from 'react-bootstrap-table2-filter';
 
 
@@ -93,6 +95,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
 const Customers = props => {
 
     const [customerList, setCustomerList] = React.useState([]);
@@ -105,42 +109,54 @@ const Customers = props => {
     const [openModalUser, setOpenModalUser] = React.useState(false);
     const [amount, setAmount] = React.useState(0);
     const [selctedUserId, setSelectedUseriD] = React.useState(null);
+    const [loader, setLoader] = React.useState(false);
+    // const [offset, setOffset] = React.useState(null);
+    // const [prevPageUrl, setPrevPageUrl] = React.useState(null);
+    const [totalSize, setTotalSize] = React.useState(0);
 
     // Set Customer's List
     useEffect(() => {
+        console.log(props.customerResponse.next)
         setCustomerList(props.customerList)
-    }, [props.customerList])
+        // setNextPageUrl(props.customerResponse.next)
+        // setPrevPageUrl(props.customerResponse.previous)
+        setTotalSize(props.customerResponse.count)
+    }, [props])
 
-   
+
 
     useEffect(() => {
-        if(open){
+        if (open) {
+            const r = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 });
+            setLoader(true);
+            r.then((res) => {
+                setLoader(false);
+                if (res && res.data) {
+                    setUserCardsList(res.data['data'])
+                    // setRes(true);
+                }
+            }).catch(er => {
+                setLoader(false);
+            });
+            const x = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_by_id', 'userid': selctedUserId })
+            setLoader(true);
+            x.then((res) => {
+                setLoader(false);
+                if (res && res.data) {
+                    setCustomerCardsList(res.data['data'])
+                }
+            }).catch(er => {
+                setLoader(false);
+                if (er.status === 403 || er.status === 405) {
+                    toast.error('Permission Denied');
+                }
+                else {
+                    toast.error('Something Went Wrong');
+                }
+            });
 
-        
-        const r = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards', 'userid': 65 });
-        r.then((res) => {
-            if (res && res.data) {
-                setUserCardsList(res.data['data'])
-                // setRes(true);
-            }
-        }).catch(er => {
-        });
-        const x = agent.DigitalWallet.get_cards({ 'action': 'get_users_cards_by_id', 'userid': selctedUserId })
-        x.then((res) => {
-            if (res && res.data) {
-                setCustomerCardsList(res.data['data'])
-            }
-        }).catch(er => {
-            if(er.status===403 || er.status === 405){
-                toast.error('Permission Denied');
-            }
-            else{
-                toast.error('Something Went Wrong');
-            }
-        });
-
-    }
-    }, [open,selctedUserId])
+        }
+    }, [open, selctedUserId])
 
 
     const handleOpenModal = () => {
@@ -150,8 +166,8 @@ const Customers = props => {
     const handleOpen = (userid) => {
         setSelectedUseriD(userid);
         setOpen(true);
-        console.log(userid,'userid');
-        
+        console.log(userid, 'userid');
+
     };
 
     const handleClose = () => {
@@ -181,12 +197,12 @@ const Customers = props => {
         setOpenModalUser(true);
     };
 
-    
+
     // Transfer Money
     const onClickButton = () => {
         if (userCard && customerCard) {
             var transferData = {
-                action:'from_customer',
+                action: 'from_customer',
                 from_card_id: userCard['id'],
                 to_card_id: customerCard['id'],
                 // to_card_id : 4,
@@ -194,8 +210,10 @@ const Customers = props => {
             }
             console.log(transferData)
             const t = agent.DigitalWallet.transfer_money(transferData)
+            setLoader(true);
             t.then((res) => {
                 if (res && res.data && res.data['msg'] === 'Success') {
+                    setLoader(false);
                     console.log(res);
                     toast.success('Money added Succesfully');
                     handleClose();
@@ -204,7 +222,8 @@ const Customers = props => {
                 else {
                     toast.error(res.data['msg']);
                 }
-            }).catch(err=>{
+            }).catch(err => {
+                setLoader(false);
                 toast.error('Permission Denied');
             })
 
@@ -217,9 +236,12 @@ const Customers = props => {
     // Deactivate User
     function deavtivateUser(user_id) {
         if (user_id) {
-            agent.DigitalWallet.update_cutomers({ 'id': user_id }).then((res) => {
+            const t = agent.DigitalWallet.update_cutomers({ 'id': user_id })
+            setLoader(true);
+            t.then((res) => {
                 console.log(res.data)
                 props.setUpdate(true)
+                setLoader(false);
             })
         }
     }
@@ -290,47 +312,87 @@ const Customers = props => {
         }
     ];
 
-    
+    const pageListRenderer = ({
+        pages,
+        active,
+        onPageChange
+      }) => {
+        // just exclude <, <<, >>, >
+        const pageWithoutIndication = pages.filter(p => typeof p.page !== 'string');
+        
+        console.log('pageWithoutIndication',pageWithoutIndication)
+        console.log('onPageChange',pages,active)
+        return (
+          <div>
+            {
+              pageWithoutIndication.map(p => (
+                <button className="btn btn-success" key={p.page} onClick={ () => {onPageChange(p.page); pageWithoutIndication['active']=true; props.setCustomerOffset(p.page*6-6);} }>{ p.page }</button>
+              ))
+            
+            }
+          </div>
+        );
+      };
 
+    // const onPageChange = (page, sizePerPage) => {
+    // // alert(`page: ${page}, sizePerPage: ${sizePerPage}`);
+    // console.log(page)
+    // props.setCustomerOffset(page*6-6);
+    // console.log(page)
+    // }
+
+    const pagination = paginationFactory({
+    
+    totalSize:totalSize,
+    sizePerPage:6,
+    pageListRenderer:pageListRenderer,
+    // onPageChange:onPageChange
+    });
+
+    console.log('totalSize',totalSize)
     const classes = useStyles();
     return (
         <React.Fragment>
-            <div style={{ padding: "20px;" }} className='col-sm-12'>
+            <div style={{ padding: "20px", }} className='col-sm-12'>
                 <h1 className="h2">Customers</h1>
-                <div>
-                    <ToolkitProvider
-                       keyField="id"
-                       data={customerList}
-                       columns={columns}
-                       search={ { searchFormatted: true } }
-                     
-                    >
-                        {
-                            props => (
-                                <div>
-                                   
-                                    <div style={{float:'right'}}>
-                                    <SearchBar { ...props.searchProps } />
-                                    </div>
-                                    <hr />
-                                    <BootstrapTable
-                                        { ...props.baseProps }
-                                        striped
-                                        hover
-                                        bootstrap4
-                                        condensed
-                                        wrapperClasses="table-responsive"
-                                        classes={classes.tab}
-                                        headerClasses="bg-200 text-900 border-y border-200"
-                                        pagination={paginationFactory()}
+                {!loader && totalSize ?
+                    <div>
+                        <ToolkitProvider
+                            keyField="id"
+                            data={customerList}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+
+                        >
+                            {
+                                props => (
+                                    <div>
+
+                                        <div style={{ float: 'right' }}>
+                                            <SearchBar {...props.searchProps} />
+                                        </div>
+                                        <hr />
+                                        <BootstrapTable
+                                            {...props.baseProps}
+                                            striped
+                                            hover
+                                            bootstrap4
+                                            condensed
+                                            wrapperClasses="table-responsive"
+                                            classes={classes.tab}
+                                            headerClasses="bg-200 text-900 border-y border-200"
+                                            pagination={pagination}
                                         // filter={ filterFactory()}
-                                        
-                                    />
-                                </div>
-                            )
-                        }
-                    </ToolkitProvider>
-                </div>
+
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+                    </div>
+                    :
+                    <Loader />
+                }
             </div>
 
             <Modal
@@ -346,109 +408,114 @@ const Customers = props => {
                 }}
             >
                 <Fade in={open}>
-                    <div className={classes.paper} style={{ display: 'inline-table' }}>
+                    <div className={classes.paper} style={{ display: 'inline-table', }}>
                         <h2 id="transition-modal-title">Transfer Money to Customer</h2>
-                        <br />
-                        <Row>
-                            <Col>
-                                <FormControl className={classes.formControl} style={{ width: '50%' }}>
-                                    <InputLabel id="demo-controlled-open-select-label1">Select Your Card</InputLabel>
+                        {!loader ?
+                            <div>
+                                <br />
+                                <Row xxs="2">
+                                    <Col xs="12" md="6">
+                                        <FormControl className={classes.formControl} style={{ width: '100%' }}>
+                                            <InputLabel id="demo-controlled-open-select-label1">Select Your Card</InputLabel>
 
-                                    <Select
-                                        labelId="demo-controlled-open-select-label1"
-                                        id="demo-controlled-open-select1"
-                                        open={openModalUser}
-                                        onClose={handleCloseModalUSer}
-                                        onOpen={handleOpenModalUser}
-                                        value={userCard}
-                                        onChange={handleChangeModalUser}
-                                    >
-                                        <MenuItem value="Select Gift Card">
-                                            <em>None</em>
-                                        </MenuItem>
+                                            <Select
+                                                labelId="demo-controlled-open-select-label1"
+                                                id="demo-controlled-open-select1"
+                                                open={openModalUser}
+                                                onClose={handleCloseModalUSer}
+                                                onOpen={handleOpenModalUser}
+                                                value={userCard}
+                                                onChange={handleChangeModalUser}
+                                            >
+                                                <MenuItem value="Select Gift Card">
+                                                    <em>None</em>
+                                                </MenuItem>
 
-                                        {isIterableArray(userCardsList) &&
-                                            userCardsList.map((user_card, index) => {
-                                                return (
-                                                    <option key={index} value={user_card} >
-                                                        {user_card['card_number']}
-                                                    </option>
-                                                )
-                                            }
-                                            )}
-                                    </Select>
-
-
-                                </FormControl>
-
-                            </Col>
-                            <Col>
-                                <FormControl className={classes.formControl} style={{ width: '50%' }}>
-                                    <InputLabel id="demo-controlled-open-select-label2">To Card</InputLabel>
-
-                                    <Select
-                                        labelId="demo-controlled-open-select-label2"
-                                        id="demo-controlled-open-select2"
-                                        open={openModal}
-                                        onClose={handleCloseModal}
-                                        onOpen={handleOpenModal}
-                                        value={customerCard}
-                                        onChange={handleChangeModal}
-                                    >
-                                        <MenuItem value="Select Gift Card">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        {console.log(customerCardsList)}
-                                        {isIterableArray(customerCardsList) &&
-                                            customerCardsList.map((customer_card, index) => {
-                                                return (
-                                                    <option key={index} value={customer_card} >
-                                                        {customer_card['card_number']}
-                                                    </option>
-                                                )
-                                            }
-                                            )}
-                                    </Select>
+                                                {isIterableArray(userCardsList) &&
+                                                    userCardsList.map((user_card, index) => {
+                                                        return (
+                                                            <option key={index} value={user_card} >
+                                                                {CardFormatter(user_card['card_number'].toString())}
+                                                            </option>
+                                                        )
+                                                    }
+                                                    )}
+                                            </Select>
 
 
-                                </FormControl>
+                                        </FormControl>
 
-                            </Col>
+                                    </Col>
+                                    <Col xs="12" md="6">
+                                        <FormControl className={classes.formControl} style={{ width: '100%' }}>
+                                            <InputLabel id="demo-controlled-open-select-label2">To Card</InputLabel>
 
-                        </Row>
-                        <br />
-                        <Row style={{ alignItems: 'center' }}>
-                            <Col>
-                                <TextField
-                                    variant="outlined"
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    name="amount"
-                                    label="Amount"
-                                    id="amount"
-                                    autoComplete="amount"
-                                    value={amount}
-                                    onChange={handleChangeAmount}
-                                />
-                            </Col>
-                            <Col>
+                                            <Select
+                                                labelId="demo-controlled-open-select-label2"
+                                                id="demo-controlled-open-select2"
+                                                open={openModal}
+                                                onClose={handleCloseModal}
+                                                onOpen={handleOpenModal}
+                                                value={customerCard}
+                                                onChange={handleChangeModal}
+                                            >
+                                                <MenuItem value="Select Gift Card">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                {console.log(customerCardsList)}
+                                                {isIterableArray(customerCardsList) &&
+                                                    customerCardsList.map((customer_card, index) => {
+                                                        return (
+                                                            <option key={index} value={customer_card} >
+                                                                {CardFormatter(customer_card['card_number'].toString())}
+                                                            </option>
+                                                        )
+                                                    }
+                                                    )}
+                                            </Select>
 
-                                <Button
-                                    // type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    // className={classes.submit}
-                                    onClick={onClickButton}
-                                >
-                                    Transfer
-                                </Button>
 
-                            </Col>
+                                        </FormControl>
 
-                        </Row>
+                                    </Col>
 
+                                </Row>
+                                <br />
+                                <Row style={{ alignItems: 'center' }}>
+                                    <Col xs="12" md="6">
+                                        <TextField
+                                            variant="outlined"
+                                            margin="normal"
+                                            required
+                                            fullWidth
+                                            name="amount"
+                                            label="Amount"
+                                            id="amount"
+                                            autoComplete="amount"
+                                            value={amount}
+                                            onChange={handleChangeAmount}
+                                        />
+                                    </Col>
+                                    <Col xs="12" md="6">
+
+                                        <Button
+                                            // type="submit"
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            // className={classes.submit}
+                                            onClick={onClickButton}
+                                        >
+                                            Transfer
+                                        </Button>
+
+                                    </Col>
+
+                                </Row>
+                            </div>
+                            :
+                            <Loader />
+                        }
                     </div>
                 </Fade>
 
